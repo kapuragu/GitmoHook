@@ -121,50 +121,29 @@ static void __fastcall hkSetTextureName(void* modelNodeMesh, uint64_t textureHas
 // Install
 // ----------------------------------------------------
 
-bool Install_SetEquipBackgroundTexture_Location_Hooks()
+bool Install_SetEquipBackgroundTexture_Hook()
 {
-    const uintptr_t base = GetExeBase();
-    if (!base)
-        return false;
-
     void* targetSetEquipBackgroundTexture =
-        reinterpret_cast<void*>(base + ToRva(ABS_SetEquipBackgroundTexture));
+        ResolveGameAddress(ABS_SetEquipBackgroundTexture);
 
-    void* targetSetTextureName =
-        reinterpret_cast<void*>(base + ToRva(ABS_SetTextureName));
-
-    const MH_STATUS initSt = MH_Initialize();
-    if (initSt != MH_OK && initSt != MH_ERROR_ALREADY_INITIALIZED)
-        return false;
-
-    MH_STATUS st = MH_CreateHook(
+    void* targetSetTextureName = ResolveGameAddress(ABS_SetTextureName);
+    
+    const bool okSetEquipBackgroundTexture = CreateAndEnableHook(
         targetSetEquipBackgroundTexture,
-        &hkSetEquipBackgroundTexture,
+        reinterpret_cast<void*>(&hkSetEquipBackgroundTexture),
         reinterpret_cast<void**>(&g_OrigSetEquipBackgroundTexture));
-    if (st != MH_OK && st != MH_ERROR_ALREADY_CREATED)
-        return false;
-
-    st = MH_CreateHook(
+    
+    const bool okSetTextureName = CreateAndEnableHook(
         targetSetTextureName,
-        &hkSetTextureName,
+        reinterpret_cast<void*>(&hkSetTextureName),
         reinterpret_cast<void**>(&g_OrigSetTextureName));
-    if (st != MH_OK && st != MH_ERROR_ALREADY_CREATED)
-        return false;
 
-    st = MH_EnableHook(targetSetEquipBackgroundTexture);
-    if (st != MH_OK && st != MH_ERROR_ENABLED)
-        return false;
-
-    st = MH_EnableHook(targetSetTextureName);
-    if (st != MH_OK && st != MH_ERROR_ENABLED)
-        return false;
-
-    Log("[Hook] SetEquipBackgroundTexture location-40 hooks installed\n");
+    Log("[Hook] SetEquipBackgroundTexture hooks installed %p and %p\n",okSetEquipBackgroundTexture,okSetTextureName);
     return true;
 }
 
 // Removes the SetLuaFunctions hook.
-bool Uninstall_SetEquipBackgroundTexture_Location_Hooks()
+bool Uninstall_SetEquipBackgroundTexture_Hook()
 {
     DisableAndRemoveHook(ResolveGameAddress(ABS_SetEquipBackgroundTexture));
     DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));

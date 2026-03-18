@@ -64,34 +64,18 @@ ChangeLocationMenuParameter* __thiscall hkGetChangeLocationMenuParameterByLocati
 
 bool Install_ChangeLocationMenu_Hook()
 {
-    const uintptr_t base = GetExeBase();
-    if (!base)
-        return false;
-
-    ChangeLocationMenuParameter* target = reinterpret_cast<ChangeLocationMenuParameter*>(
-        base + ToRva(ABS_GetChangeLocationMenuParameterByLocationId));
+    void* target = ResolveGameAddress(ABS_GetChangeLocationMenuParameterByLocationId);
 
     g_OrigGetMbFreeChangeLocationMenuParameter = reinterpret_cast<GetMbFreeChangeLocationMenuParameter_t>(
-        base + ToRva(ABS_GetMbFreeChangeLocationMenuParameter));
+        ResolveGameAddress(ABS_GetMbFreeChangeLocationMenuParameter));
 
-    const MH_STATUS initSt = MH_Initialize();
-    if (initSt != MH_OK && initSt != MH_ERROR_ALREADY_INITIALIZED)
-        return false;
-
-    MH_STATUS st = MH_CreateHook(
+    const bool okTarget = CreateAndEnableHook(
         target,
-        &hkGetChangeLocationMenuParameterByLocationId,
+        reinterpret_cast<void*>(&hkGetChangeLocationMenuParameterByLocationId),
         reinterpret_cast<void**>(&g_OrigGetChangeLocationMenuParameterByLocationId));
 
-    if (st != MH_OK && st != MH_ERROR_ALREADY_CREATED)
-        return false;
-
-    st = MH_EnableHook(target);
-    if (st != MH_OK && st != MH_ERROR_ENABLED)
-        return false;
-
-    Log("[Hook] ChangeLocationMenu installed at %p\n", target);
-    return true;
+    Log("[Hook] ChangeLocationMenu %p installed at %p\n", okTarget, target);
+    return okTarget;
 }
 
 // Removes the SetLuaFunctions hook.

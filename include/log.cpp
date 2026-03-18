@@ -10,7 +10,9 @@ static FILE* g_LogFile = nullptr;
 
 void InitLog()
 {
-    #if _DEBUG
+#if _DEBUG
+
+#endif // _DEBUG
 
     AllocConsole();
     FILE* dummy;
@@ -28,8 +30,6 @@ void InitLog()
     fopen_s(&g_LogFile, path, "w");
     if (g_LogFile)
         fprintf(g_LogFile, "[LOG] Log file created successfully.\n");
-
-    #endif // _DEBUG
 }
 
 void Log(const char* fmt, ...)

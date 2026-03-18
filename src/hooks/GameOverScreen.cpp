@@ -79,40 +79,24 @@ static void __fastcall hkGameOverSetVisible(uint64_t* param_1, char param_2)
     if (node11) g_SetTextureName(node11, TEX_BLUR_GZ, 0x3bbf9889ull, 2);
 }
 
-bool Install_GameOver_Location40_Hook()
+bool Install_GameOverScreen_Hook()
 {
-    const uintptr_t base = GetExeBase();
-    if (!base)
-        return false;
-
     g_SetTextureName = reinterpret_cast<SetTextureName_t>(
-        base + ToRva(ABS_SetTextureName));
+        ResolveGameAddress(ABS_SetTextureName));
 
-    void* target = reinterpret_cast<void*>(
-        base + ToRva(ABS_GameOverSetVisible));
-
-    const MH_STATUS initSt = MH_Initialize();
-    if (initSt != MH_OK && initSt != MH_ERROR_ALREADY_INITIALIZED)
-        return false;
-
-    MH_STATUS st = MH_CreateHook(
+    void* target = ResolveGameAddress(ABS_GameOverSetVisible);
+    
+    const bool okTarget = CreateAndEnableHook(
         target,
-        &hkGameOverSetVisible,
+        reinterpret_cast<void*>(&hkGameOverSetVisible),
         reinterpret_cast<void**>(&g_OrigGameOverSetVisible));
 
-    if (st != MH_OK && st != MH_ERROR_ALREADY_CREATED)
-        return false;
-
-    st = MH_EnableHook(target);
-    if (st != MH_OK && st != MH_ERROR_ENABLED)
-        return false;
-
-    Log("[Hook] GameOver location-40 hook installed\n");
-    return true;
+    Log("[Hook] GameOverScreen hook installed? %p\n", okTarget);
+    return okTarget;
 }
 
 // Removes the SetLuaFunctions hook.
-bool Uninstall_GameOver_Location40_Hook()
+bool Uninstall_GameOverScreen_Hook()
 {
     DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));
     DisableAndRemoveHook(ResolveGameAddress(ABS_GameOverSetVisible));

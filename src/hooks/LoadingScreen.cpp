@@ -72,40 +72,24 @@ static void __fastcall hkLoadingScreenOrGameOverSplash2(void* param_1)
     }
 }
 
-bool Install_LoadingScreen_Location40_Hook()
+bool Install_LoadingScreen_Hook()
 {
-    const uintptr_t base = GetExeBase();
-    if (!base)
-        return false;
-
     g_SetTextureName = reinterpret_cast<SetTextureName_t>(
-        base + ToRva(ABS_SetTextureName));
+        ResolveGameAddress(ABS_SetTextureName));
 
-    void* target = reinterpret_cast<void*>(
-        base + ToRva(ABS_LoadingScreenOrGameOverSplash2));
-
-    const MH_STATUS initSt = MH_Initialize();
-    if (initSt != MH_OK && initSt != MH_ERROR_ALREADY_INITIALIZED)
-        return false;
-
-    MH_STATUS st = MH_CreateHook(
+    void* target = ResolveGameAddress(ABS_LoadingScreenOrGameOverSplash2);
+    
+    const bool okTarget = CreateAndEnableHook(
         target,
-        &hkLoadingScreenOrGameOverSplash2,
+        reinterpret_cast<void*>(&hkLoadingScreenOrGameOverSplash2),
         reinterpret_cast<void**>(&g_OrigLoadingScreenOrGameOverSplash2));
 
-    if (st != MH_OK && st != MH_ERROR_ALREADY_CREATED)
-        return false;
-
-    st = MH_EnableHook(target);
-    if (st != MH_OK && st != MH_ERROR_ENABLED)
-        return false;
-
-    Log("[Hook] LoadingScreenOrGameOverSplash2 installed at %p\n", target);
-    return true;
+    Log("[Hook] LoadingScreenOrGameOverSplash2 installed %p at %p\n", okTarget, target);
+    return okTarget;
 }
 
 // Removes the SetLuaFunctions hook.
-bool Uninstall_LoadingScreen_Location40_Hook()
+bool Uninstall_LoadingScreen_Hook()
 {
     DisableAndRemoveHook(ResolveGameAddress(ABS_LoadingScreenOrGameOverSplash2));
     DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));

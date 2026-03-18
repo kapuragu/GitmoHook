@@ -5,22 +5,8 @@
 
 #include "MinHook.h"
 #include "log.h"
-
-// Installs the Lua registration hook.
-bool Install_SetLuaFunctions_Hook();
-bool Install_GameOver_Location40_Hook();
-bool Install_LoadingScreen_Location40_Hook();
-bool Install_SetEquipBackgroundTexture_Location_Hooks();
-bool Install_HeliCallVoice_Hook();
-bool Install_ChangeLocationMenu_Hook();
-
-// Removes the Lua registration hook.
-bool Uninstall_SetLuaFunctions_Hook();
-bool Uninstall_GameOver_Location40_Hook();
-bool Uninstall_LoadingScreen_Location40_Hook();
-bool Uninstall_SetEquipBackgroundTexture_Location_Hooks();
-bool Uninstall_HeliCallVoice_Hook();
-bool Uninstall_ChangeLocationMenu_Hook();
+#include "BuiltInModules.h"
+#include "FeatureModule.h"
 
 namespace
 {
@@ -28,7 +14,7 @@ namespace
     static std::atomic_bool gConsoleReady{ false };
 }
 
-// Creates or attaches a console for debug logging.
+
 static void SetupConsole()
 {
     if (gConsoleReady.load())
@@ -49,13 +35,12 @@ static void SetupConsole()
     fflush(stdout);
 }
 
-// Initializes MinHook and all runtime hooks on a worker thread.
+
 static DWORD WINAPI InitThread(LPVOID)
 {
     #ifdef _DEBUG
     SetupConsole();
-    #endif // DEBUG
-
+    #endif
 
     Log("[DLL] InitThread started.\n");
 
@@ -64,40 +49,22 @@ static DWORD WINAPI InitThread(LPVOID)
     if (st != MH_OK && st != MH_ERROR_ALREADY_INITIALIZED)
         return 0;
 
-    const bool okLua = Install_SetLuaFunctions_Hook();
-    Log("[DLL] Install_SetLuaFunctions_Hook: %s\n", okLua ? "OK" : "FAIL");
+    RegisterBuiltInFeatureModules();
 
-    const bool okGameOver = Install_GameOver_Location40_Hook();
-    Log("[DLL] Install_GameOver_Location40_Hook: %s\n", okGameOver ? "OK" : "FAIL");
-
-    const bool okLoadingScreen = Install_LoadingScreen_Location40_Hook();
-    Log("[DLL] Install_GameOver_Location40_Hook: %s\n", okLoadingScreen ? "OK" : "FAIL");
-
-    const bool okSetEquipBackgroundTexture = Install_SetEquipBackgroundTexture_Location_Hooks();
-    Log("[DLL] Install_GameOver_Location40_Hook: %s\n", okSetEquipBackgroundTexture ? "OK" : "FAIL");
-
-    //const bool okHeliCallVoice = Install_HeliCallVoice_Hook();
-    //Log("[DLL] Install_HeliCallVoice_Hook: %s\n", okHeliCallVoice ? "OK" : "FAIL");
-
-    const bool okChangeLocationMenu = Install_ChangeLocationMenu_Hook();
-    Log("[DLL] Install_ChangeLocationMenu_Hook: %s\n", okChangeLocationMenu ? "OK" : "FAIL");
+    HMODULE hGame = GetModuleHandleW(nullptr);
+    const bool allOk = FeatureModuleRegistry::Instance().InstallAll(hGame);
+    Log("[DLL] FeatureModuleRegistry::InstallAll -> %s\n", allOk ? "OK" : "PARTIAL/FAIL");
 
     Log("[DLL] InitThread done.\n");
     return 0;
 }
 
-// Removes all hooks when the DLL unloads normally.
 static void UninstallAll(bool processTerminating)
 {
     if (processTerminating)
         return;
 
-    Uninstall_SetLuaFunctions_Hook();
-    Uninstall_GameOver_Location40_Hook();
-    Uninstall_LoadingScreen_Location40_Hook();
-    Uninstall_SetEquipBackgroundTexture_Location_Hooks();
-    //Uninstall_HeliCallVoice_Hook();
-    Uninstall_ChangeLocationMenu_Hook();
+    FeatureModuleRegistry::Instance().UninstallAll();
 
     MH_Uninitialize();
     Log("[DLL] UninstallAll done.\n");
@@ -106,7 +73,6 @@ static void UninstallAll(bool processTerminating)
     fflush(stderr);
 }
 
-// Standard Windows DLL entry point.
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 {
     switch (reason)

@@ -8,7 +8,6 @@
 #include "log.h"
 #include "FoxHashes.h"
 #include "GameOverScreen.h"
-#include "HeliVoice.h"
 #include "LoadingScreen.h"
 #include "SetEquipBackgroundTexture.h"
 
@@ -156,7 +155,8 @@ static bool ResolveLuaApi()
         g_lua_next;
 }
 
-// Registers the GitmoHook Lua library in the given Lua state.
+// Registers the V_FrameWork Lua library in the given Lua state.
+// Params: L (lua_State*), libName (const char*), funcs (luaL_Reg*)
 static bool RegisterLuaLibrary(lua_State* L, const char* libName, luaL_Reg* funcs)
 {
     if (!ResolveLuaApi() || !L || !libName || !funcs)
@@ -251,20 +251,17 @@ static void ClearTrackedLuaStates()
     g_RegisteredLuaStates.clear();
 }
 
+//----------------
+// LUA FUNCTIONS
+//----------------
+
 static int __cdecl l_SetEnableGzUi(lua_State* L)
 {
     const bool isEnable = GetLuaBool(L, 1) or false;
     SetEnableEquipBackgroundTexture(isEnable);
     SetEnableGameOverScreen(isEnable);
     SetEnableLoadingScreen(isEnable);
-    return 0;
-}
-
-static int __cdecl l_SetEnableGzHeliVoice(lua_State* L)
-{
-    const bool isEnable = GetLuaBool(L, 1) or false;
-    SetEnableGzHeliVoice(isEnable);
-    return 0;
+    return 1;
 }
 
 static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
@@ -277,28 +274,33 @@ static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
 
 static luaL_Reg g_GitmoHook[] =
 {   //SetDefaultEquipBgTexturePath is the one that is going to be used in lua.
-    //{ "SetDefaultEquipBgTexturePath",               l_SetDefaultEquipBgTexturePath },
     { "SetEnableGzUi", l_SetEnableGzUi },
-    { "SetEnableGzHeliVoice", l_SetEnableGzHeliVoice },
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { nullptr, nullptr }
 };
 
-// Registers GitmoHook into a UI Lua state only once.
+//-----------------------
+// Register Lua libraries
+//-----------------------
+
+// Registers V_FrameWork into a UI Lua state only once.
+// Params: L (lua_State*)
 static void RegisterAllUiLuaLibraries(lua_State* L)
 {
     if (!L)
         return;
 
-    if (g_RegisteredLuaStates.find(L) != g_RegisteredLuaStates.end())
+    if (IsLuaStateRegistered(L))
         return;
 
-    RegisterLuaLibrary(L, "GitmoHook", g_GitmoHook);
-    g_RegisteredLuaStates.insert(L);
-}// Registers GitmoHook into a UI Lua state only once.
+    if (RegisterLuaLibrary(L, "GitmoHook", g_GitmoHook))
+    {
+        TrackLuaState(L);
+    }
+}
 
-
-// Hooked version of SetLuaFunctions that appends GitmoHook registration.
+// Hooked version of SetLuaFunctions that appends V_FrameWork registration.
+// Params: L (lua_State*)
 static void __fastcall hkSetLuaFunctions(lua_State* L)
 {
     g_OrigSetLuaFunctions(L);
@@ -312,6 +314,7 @@ extern "C" __declspec(dllexport) int __cdecl luaopen_GitmoHook(lua_State* L)
 }
 
 // Installs the SetLuaFunctions hook.
+// Params: none
 bool Install_SetLuaFunctions_Hook()
 {
     ResolveLuaApi();
@@ -330,10 +333,11 @@ bool Install_SetLuaFunctions_Hook()
 }
 
 // Removes the SetLuaFunctions hook.
+// Params: none
 bool Uninstall_SetLuaFunctions_Hook()
 {
     DisableAndRemoveHook(ResolveGameAddress(ABS_SetLuaFunctions));
     g_OrigSetLuaFunctions = nullptr;
-    g_RegisteredLuaStates.clear();
+    ClearTrackedLuaStates();
     return true;
 }
