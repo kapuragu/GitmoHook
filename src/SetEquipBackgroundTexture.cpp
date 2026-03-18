@@ -40,7 +40,7 @@ static SetTextureName_t            g_OrigSetTextureName = nullptr;
 
 static thread_local bool g_InSetEquipBackgroundTexture = false;
 static thread_local int  g_CurrentEquipId = -1;
-thread_local bool  g_isEnableEquipBg = false;
+bool g_isEnableEquipBg = false;
 
 // ----------------------------------------------------
 // Hook 1: capture equipId

@@ -38,7 +38,7 @@ static GameOverSetVisible_t g_OrigGameOverSetVisible = nullptr;
 // Context
 // ----------------------------------------------------
 
-thread_local bool  g_isEnableGameOverScreen = false;
+bool g_isEnableGameOverScreen = false;
 
 // ----------------------------------------------------
 // Texture hashes

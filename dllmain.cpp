@@ -11,12 +11,16 @@ bool Install_SetLuaFunctions_Hook();
 bool Install_GameOver_Location40_Hook();
 bool Install_LoadingScreen_Location40_Hook();
 bool Install_SetEquipBackgroundTexture_Location_Hooks();
+bool Install_HeliCallVoice_Hook();
+bool Install_ChangeLocationMenu_Hook();
 
 // Removes the Lua registration hook.
 bool Uninstall_SetLuaFunctions_Hook();
 bool Uninstall_GameOver_Location40_Hook();
 bool Uninstall_LoadingScreen_Location40_Hook();
 bool Uninstall_SetEquipBackgroundTexture_Location_Hooks();
+bool Uninstall_HeliCallVoice_Hook();
+bool Uninstall_ChangeLocationMenu_Hook();
 
 namespace
 {
@@ -72,6 +76,12 @@ static DWORD WINAPI InitThread(LPVOID)
     const bool okSetEquipBackgroundTexture = Install_SetEquipBackgroundTexture_Location_Hooks();
     Log("[DLL] Install_GameOver_Location40_Hook: %s\n", okSetEquipBackgroundTexture ? "OK" : "FAIL");
 
+    //const bool okHeliCallVoice = Install_HeliCallVoice_Hook();
+    //Log("[DLL] Install_HeliCallVoice_Hook: %s\n", okHeliCallVoice ? "OK" : "FAIL");
+
+    const bool okChangeLocationMenu = Install_ChangeLocationMenu_Hook();
+    Log("[DLL] Install_ChangeLocationMenu_Hook: %s\n", okChangeLocationMenu ? "OK" : "FAIL");
+
     Log("[DLL] InitThread done.\n");
     return 0;
 }
@@ -86,6 +96,8 @@ static void UninstallAll(bool processTerminating)
     Uninstall_GameOver_Location40_Hook();
     Uninstall_LoadingScreen_Location40_Hook();
     Uninstall_SetEquipBackgroundTexture_Location_Hooks();
+    //Uninstall_HeliCallVoice_Hook();
+    Uninstall_ChangeLocationMenu_Hook();
 
     MH_Uninitialize();
     Log("[DLL] UninstallAll done.\n");

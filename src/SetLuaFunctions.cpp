@@ -3,10 +3,12 @@
 #include <cstdint>
 #include <unordered_set>
 
+#include "ChangeLocationMenu.h"
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
 #include "GameOverScreen.h"
+#include "HeliVoice.h"
 #include "LoadingScreen.h"
 #include "SetEquipBackgroundTexture.h"
 
@@ -25,6 +27,10 @@ namespace
     using lua_tonumber_t = lua_Number(__fastcall*)(lua_State* L, int idx);
     using lua_pushnumber_t = void(__fastcall*)(lua_State* L, lua_Number n);
     using lua_toboolean_t = int(__fastcall*)(lua_State* L, int idx);
+    using lua_settop_t = void(__fastcall*)(lua_State* L, int idx);
+    using lua_type_t = int(__fastcall*)(lua_State* L, int idx);
+    using lua_pushnil_t = void(__fastcall*)(lua_State* L);
+    using lua_next_t = int(__fastcall*)(lua_State* L, int idx);
 
     // Absolute address of tpp::ui::UiCommand::SetLuaFunctions.
     // Params: L (lua_State*)
@@ -54,6 +60,11 @@ namespace
     // Params: L (lua_State*), idx (int)
     static constexpr uintptr_t ABS_lua_toboolean = 0x141A12330ull;
 
+    static constexpr uintptr_t ABS_lua_settop = 0x14C1EBBE0ull;
+    static constexpr uintptr_t ABS_lua_type = 0x14C1ED760ull;
+    static constexpr uintptr_t ABS_lua_pushnil = 0x14C1E7CC0ull;
+    static constexpr uintptr_t ABS_lua_next = 0x14C1DA770ull;
+
     static SetLuaFunctions_t       g_OrigSetLuaFunctions = nullptr;
     static FoxLuaRegisterLibrary_t g_FoxLuaRegisterLibrary = nullptr;
     static lua_tolstring_t         g_lua_tolstring = nullptr;
@@ -61,6 +72,10 @@ namespace
     static lua_tonumber_t          g_lua_tonumber = nullptr;
     static lua_pushnumber_t        g_lua_pushnumber = nullptr;
     static lua_toboolean_t         g_lua_toboolean = nullptr;
+    static lua_settop_t g_lua_settop = nullptr;
+    static lua_type_t   g_lua_type = nullptr;
+    static lua_pushnil_t    g_lua_pushnil = nullptr;
+    static lua_next_t   g_lua_next = nullptr;
 
     static std::unordered_set<lua_State*> g_RegisteredLuaStates;
     static std::mutex g_RegisteredLuaStatesMutex;
@@ -105,12 +120,40 @@ static bool ResolveLuaApi()
             ResolveGameAddress(ABS_lua_toboolean));
     }
 
+    if (!g_lua_settop)
+    {
+        g_lua_settop = reinterpret_cast<lua_settop_t>(
+            ResolveGameAddress(ABS_lua_settop));
+    }
+
+    if (!g_lua_type)
+    {
+        g_lua_type = reinterpret_cast<lua_type_t>(
+            ResolveGameAddress(ABS_lua_type));
+    }
+
+    if (!g_lua_pushnil)
+    {
+        g_lua_pushnil = reinterpret_cast<lua_pushnil_t>(
+            ResolveGameAddress(ABS_lua_pushnil));
+    }
+
+    if (!g_lua_next)
+    {
+        g_lua_next = reinterpret_cast<lua_next_t>(
+            ResolveGameAddress(ABS_lua_next));
+    }
+
     return g_FoxLuaRegisterLibrary &&
         g_lua_tolstring &&
         g_lua_tointeger &&
         g_lua_tonumber &&
         g_lua_toboolean &&
-        g_lua_pushnumber;
+        g_lua_pushnumber &&
+        g_lua_settop &&
+        g_lua_type &&
+        g_lua_pushnil &&
+        g_lua_next;
 }
 
 // Registers the GitmoHook Lua library in the given Lua state.
@@ -217,10 +260,27 @@ static int __cdecl l_SetEnableGzUi(lua_State* L)
     return 0;
 }
 
+static int __cdecl l_SetEnableGzHeliVoice(lua_State* L)
+{
+    const bool isEnable = GetLuaBool(L, 1) or false;
+    SetEnableGzHeliVoice(isEnable);
+    return 0;
+}
+
+static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
+{
+    unsigned short locationCode = GetLuaInt(L, 1);
+    Log("{%llX}\n",locationCode);
+    AddLocationIdToChangeLocationMenu(locationCode);
+    return 1;
+}
+
 static luaL_Reg g_GitmoHook[] =
 {   //SetDefaultEquipBgTexturePath is the one that is going to be used in lua.
     //{ "SetDefaultEquipBgTexturePath",               l_SetDefaultEquipBgTexturePath },
-    { "SetEnableGzUi",               l_SetEnableGzUi },
+    { "SetEnableGzUi", l_SetEnableGzUi },
+    { "SetEnableGzHeliVoice", l_SetEnableGzHeliVoice },
+    { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { nullptr, nullptr }
 };
 

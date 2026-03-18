@@ -153,7 +153,10 @@
     <ClInclude Include="include\lualib.h" />
     <ClInclude Include="include\MinHook.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="src\ChangeLocationMenu.h" />
     <ClInclude Include="src\GameOverScreen.h" />
+    <ClInclude Include="src\HeliVoice.h" />
+    <ClInclude Include="src\HookUtils.h" />
     <ClInclude Include="src\LoadingScreen.h" />
     <ClInclude Include="src\SetEquipBackgroundTexture.h" />
   </ItemGroup>
@@ -167,7 +170,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\ChangeLocationMenu.cpp" />
     <ClCompile Include="src\GameOverScreen.cpp" />
+    <ClCompile Include="src\HeliVoice.cpp" />
     <ClCompile Include="src\LoadingScreen.cpp" />
     <ClCompile Include="src\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\SetLuaFunctions.cpp" />

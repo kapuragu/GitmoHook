@@ -31,7 +31,7 @@ static SetTextureName_t g_SetTextureName = nullptr;
 // Context
 // ----------------------------------------------------
 
-static thread_local bool  g_isEnableLoadingScreen = false;
+static bool g_isEnableLoadingScreen = false;
 
 // Cyprus textures
 static constexpr uint64_t TEX_LOADING_MAIN_CYPRUS   = 0x15693e01563c09c3ull; //   \Assets\tpp\common_source\ui\common_texture\cm_mblogo_clp_1.ftex
