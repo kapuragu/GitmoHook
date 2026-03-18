@@ -6,6 +6,7 @@
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
+#include "MissionCodeGuard.h"
 
 extern "C" {
     #include "lua.h"
@@ -48,6 +49,9 @@ bool g_isEnableEquipBg = false;
 
 static uint8_t __fastcall hkSetEquipBackgroundTexture(int equipId, void* isSortieWeapon)
 {
+    if (MissionCodeGuard::ShouldBypassHooks())
+        return g_OrigSetEquipBackgroundTexture(equipId, isSortieWeapon);
+    
     g_InSetEquipBackgroundTexture = true;
     g_CurrentEquipId = equipId;
 
@@ -63,6 +67,9 @@ static constexpr uint64_t TEX_DEFAULT_ORIG = 0x15695ed8a56ae919ull;
 
 static void __fastcall hkSetTextureName(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk)
 {
+    if (MissionCodeGuard::ShouldBypassHooks())
+        return g_OrigSetTextureName(modelNodeMesh, textureHash, slotHash, unk);
+    
     if (g_InSetEquipBackgroundTexture)
     {
         if (g_isEnableEquipBg)

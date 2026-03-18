@@ -11,6 +11,8 @@
 
 #include <map>
 
+#include "MissionCodeGuard.h"
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -48,6 +50,9 @@ std::list<unsigned short> changeLocationMenuIds{};
 
 ChangeLocationMenuParameter* __thiscall hkGetChangeLocationMenuParameterByLocationId(MotherBaseMissionCommonData* This, unsigned short locationCode)
 {
+    if (MissionCodeGuard::ShouldBypassHooks())
+        return g_OrigGetChangeLocationMenuParameterByLocationId(This,locationCode);
+    
     //Joey's structs and iteration code!
     ChangeLocationMenuParameter* params = This->ChangeLocationMenuParams;
     for (int i = 0; i < This->ChangeLocationMenuParamCount; i++)

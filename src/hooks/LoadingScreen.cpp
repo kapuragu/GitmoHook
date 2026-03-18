@@ -6,6 +6,7 @@
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
+#include "MissionCodeGuard.h"
 
 extern "C" {
     #include "lua.h"
@@ -44,6 +45,9 @@ static constexpr uint64_t TEX_LOADING_BLUR_GZ       = 0x156a20d598cc4802ull; // 
 static void __fastcall hkLoadingScreenOrGameOverSplash2(void* param_1)
 {
     g_OrigLoadingScreenOrGameOverSplash2(param_1);
+    
+    if (MissionCodeGuard::ShouldBypassHooks())
+        return;
 
     if (!g_isEnableLoadingScreen)
         return;

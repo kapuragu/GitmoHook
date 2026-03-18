@@ -6,6 +6,7 @@
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
+#include "MissionCodeGuard.h"
 
 extern "C" {
     #include "lua.h"
@@ -51,6 +52,8 @@ static constexpr uint64_t TEX_BLUR_GZ = 0x156a20d598cc4802ull; //   \Assets\tpp\
 static void __fastcall hkGameOverSetVisible(uint64_t* param_1, char param_2)
 {
     g_OrigGameOverSetVisible(param_1, param_2);
+    if (MissionCodeGuard::ShouldBypassHooks())
+        return;
 
     if (param_2 == 0)
         return;

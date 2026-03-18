@@ -158,7 +158,9 @@
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
     <ClInclude Include="src\hooks\LoadingScreen.h" />
+    <ClInclude Include="src\hooks\MissionCodeGuard.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
+    <ClInclude Include="src\patch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -175,8 +177,10 @@
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
     <ClCompile Include="src\hooks\GameOverScreen.cpp" />
     <ClCompile Include="src\hooks\LoadingScreen.cpp" />
+    <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\hooks\SetLuaFunctions.cpp" />
+    <ClCompile Include="src\patch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\libMinHook.x64.lib" />
