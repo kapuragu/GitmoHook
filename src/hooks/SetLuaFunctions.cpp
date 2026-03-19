@@ -62,7 +62,7 @@ namespace
     static constexpr uintptr_t ABS_lua_settop = 0x14C1EBBE0ull;
     static constexpr uintptr_t ABS_lua_type = 0x14C1ED760ull;
     static constexpr uintptr_t ABS_lua_pushnil = 0x14C1E7CC0ull;
-    static constexpr uintptr_t ABS_lua_next = 0x14C1DA770ull;
+    static constexpr uintptr_t ABS_lua_next = 0x14c1da770ull;
 
     static SetLuaFunctions_t       g_OrigSetLuaFunctions = nullptr;
     static FoxLuaRegisterLibrary_t g_FoxLuaRegisterLibrary = nullptr;
@@ -251,6 +251,16 @@ static void ClearTrackedLuaStates()
     g_RegisteredLuaStates.clear();
 }
 
+static void LuaPop(lua_State* L, int idx)
+{
+    g_lua_settop( L, -(idx)-1 );
+}
+
+static bool IsLuaType(lua_State* L, int idx, char type)
+{
+    return g_lua_type(L, idx)==type;
+}
+
 //----------------
 // LUA FUNCTIONS
 //----------------
@@ -266,9 +276,20 @@ static int __cdecl l_SetEnableGzUi(lua_State* L)
 
 static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
 {
-    unsigned short locationCode = GetLuaInt(L, 1);
-    Log("{%llX}\n",locationCode);
-    AddLocationIdToChangeLocationMenu(locationCode);
+    if ( IsLuaType( L, -1,LUA_TTABLE ) ) {
+        Log("UpdateChangeLocationMenu expected table\n");
+        return 0;
+    }
+    
+    for (g_lua_pushnil(L); g_lua_next(L, -2); LuaPop(L, 1)) {
+        if ( IsLuaType( L, -1, LUA_TNUMBER ) ) {
+            unsigned short locationCode = GetLuaInt(L, -1);
+            Log("{%llX}\n",locationCode);
+            AddLocationIdToChangeLocationMenu(locationCode);
+        }
+    }
+    LuaPop( L, 1 );
+    
     return 1;
 }
 

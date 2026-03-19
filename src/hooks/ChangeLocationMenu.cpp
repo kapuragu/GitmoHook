@@ -40,8 +40,6 @@ static GetMbFreeChangeLocationMenuParameter_t g_OrigGetMbFreeChangeLocationMenuP
 // Context
 // ----------------------------------------------------
 
-static bool g_isEnableLoadingScreen = false;
-
 std::list<unsigned short> changeLocationMenuIds{};
 
 // ----------------------------------------------------
