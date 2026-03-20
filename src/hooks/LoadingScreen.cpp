@@ -21,7 +21,9 @@ using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t texture
 // Addresses
 // ----------------------------------------------------
 
+//ui::loading::LoadingScreenOrGameOverSplash2
 static constexpr uintptr_t ABS_LoadingScreenOrGameOverSplash2 = 0x145CD0630ull;
+//fox::ui::ModelNodeMesh::SetTextureName
 static constexpr uintptr_t ABS_SetTextureName = 0x141DC78F0ull;
 
 
@@ -46,8 +48,7 @@ static void __fastcall hkLoadingScreenOrGameOverSplash2(void* param_1)
 {
     g_OrigLoadingScreenOrGameOverSplash2(param_1);
     
-    if (MissionCodeGuard::ShouldBypassHooks())
-        return;
+    MISSION_GUARD_RETURN_VOID();
 
     if (!g_isEnableLoadingScreen)
         return;

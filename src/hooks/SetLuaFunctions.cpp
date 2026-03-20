@@ -8,6 +8,7 @@
 #include "log.h"
 #include "FoxHashes.h"
 #include "GameOverScreen.h"
+#include "GetPhotoAdditionalTextLangId.h"
 #include "LoadingScreen.h"
 #include "SetEquipBackgroundTexture.h"
 
@@ -30,6 +31,7 @@ namespace
     using lua_type_t = int(__fastcall*)(lua_State* L, int idx);
     using lua_pushnil_t = void(__fastcall*)(lua_State* L);
     using lua_next_t = int(__fastcall*)(lua_State* L, int idx);
+    using lua_getfield_t = void(__fastcall*)(lua_State * L, int idx, const char * k);
 
     // Absolute address of tpp::ui::UiCommand::SetLuaFunctions.
     // Params: L (lua_State*)
@@ -63,6 +65,7 @@ namespace
     static constexpr uintptr_t ABS_lua_type = 0x14C1ED760ull;
     static constexpr uintptr_t ABS_lua_pushnil = 0x14C1E7CC0ull;
     static constexpr uintptr_t ABS_lua_next = 0x14c1da770ull;
+    static constexpr uintptr_t ABS_lua_getfield = 0x14c1d7320ull;
 
     static SetLuaFunctions_t       g_OrigSetLuaFunctions = nullptr;
     static FoxLuaRegisterLibrary_t g_FoxLuaRegisterLibrary = nullptr;
@@ -75,6 +78,7 @@ namespace
     static lua_type_t   g_lua_type = nullptr;
     static lua_pushnil_t    g_lua_pushnil = nullptr;
     static lua_next_t   g_lua_next = nullptr;
+    static lua_getfield_t   g_lua_getfield = nullptr;
 
     static std::unordered_set<lua_State*> g_RegisteredLuaStates;
     static std::mutex g_RegisteredLuaStatesMutex;
@@ -143,6 +147,12 @@ static bool ResolveLuaApi()
             ResolveGameAddress(ABS_lua_next));
     }
 
+    if (!g_lua_getfield)
+    {
+        g_lua_getfield = reinterpret_cast<lua_getfield_t>(
+            ResolveGameAddress(ABS_lua_getfield));
+    }
+
     return g_FoxLuaRegisterLibrary &&
         g_lua_tolstring &&
         g_lua_tointeger &&
@@ -152,7 +162,8 @@ static bool ResolveLuaApi()
         g_lua_settop &&
         g_lua_type &&
         g_lua_pushnil &&
-        g_lua_next;
+        g_lua_next &&
+        g_lua_getfield;
 }
 
 // Registers the V_FrameWork Lua library in the given Lua state.
@@ -276,7 +287,7 @@ static int __cdecl l_SetEnableGzUi(lua_State* L)
 
 static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
 {
-    if ( IsLuaType( L, -1,LUA_TTABLE ) ) {
+    if ( !IsLuaType( L, -1,LUA_TTABLE ) ) {
         Log("UpdateChangeLocationMenu expected table\n");
         return 0;
     }
@@ -293,10 +304,62 @@ static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
     return 1;
 }
 
+static int __cdecl l_AddPhotoAdditionalText(lua_State* L)
+{
+    if ( !IsLuaType( L, -1,LUA_TTABLE ) ) {
+        Log("AddPhotoAdditionalText expected table\n");
+        return 0;
+    }
+    
+    for (g_lua_pushnil(L); g_lua_next(L, -2); LuaPop(L, 1)) 
+    {
+        if ( IsLuaType( L, -1, LUA_TTABLE ) ) 
+        {
+            unsigned short missionCode = 0xFFFF;
+            unsigned char photoId = 0xFF;
+            unsigned char photoType = 0xFF;
+            const char* targetTypeLangIdStr = "";
+            
+            g_lua_getfield(L,-1,"missionCode");
+            if (IsLuaType(L,-1,LUA_TNUMBER))
+                missionCode = static_cast<unsigned short>(GetLuaInt(L, -1));
+            LuaPop(L, 1);
+            Log("AddPhotoAdditionalText missionCode %d\n",missionCode);
+            
+            g_lua_getfield(L,-1,"photoId");
+            if (IsLuaType(L,-1,LUA_TNUMBER))
+                photoId = static_cast<unsigned char>(GetLuaInt(L, -1));
+            LuaPop(L, 1);
+            Log("AddPhotoAdditionalText photoId %d\n",photoId);
+            
+            g_lua_getfield(L,-1,"photoType");
+            if (IsLuaType(L,-1,LUA_TNUMBER))
+                photoType = static_cast<unsigned char>(GetLuaInt(L, -1));
+            LuaPop(L, 1);
+            Log("AddPhotoAdditionalText photoType %d\n",photoType);
+            
+            g_lua_getfield(L,-1,"targetTypeLangId");
+            if (IsLuaType(L,-1,LUA_TSTRING))
+                targetTypeLangIdStr = GetLuaString(L, -1);
+            LuaPop(L, 1);
+            Log("AddPhotoAdditionalText targetTypeLangIdStr %s\n",targetTypeLangIdStr);
+            
+            if (missionCode==0xFFFF) continue;
+            if (photoId==0xFF) continue;
+            if (photoType==0xFF) continue;
+            AddPhotoAdditionalText(missionCode,photoId,photoType,targetTypeLangIdStr);
+        }
+    }
+    LuaPop( L, 1 );
+    
+    return 1;
+}
+
 static luaL_Reg g_GitmoHook[] =
 {   //SetDefaultEquipBgTexturePath is the one that is going to be used in lua.
     { "SetEnableGzUi", l_SetEnableGzUi },
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
+    { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
     { nullptr, nullptr }
 };
 

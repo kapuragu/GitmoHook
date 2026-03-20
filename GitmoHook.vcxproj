@@ -157,6 +157,7 @@
     <ClInclude Include="src\FeatureModule.h" />
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
+    <ClInclude Include="src\hooks\GetPhotoAdditionalTextLangId.h" />
     <ClInclude Include="src\hooks\HeliVoice.h" />
     <ClInclude Include="src\hooks\LoadingScreen.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="src\FeatureModule.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
     <ClCompile Include="src\hooks\GameOverScreen.cpp" />
+    <ClCompile Include="src\hooks\GetPhotoAdditionalTextLangId.cpp" />
     <ClCompile Include="src\hooks\HeliVoice.cpp" />
     <ClCompile Include="src\hooks\LoadingScreen.cpp" />
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />

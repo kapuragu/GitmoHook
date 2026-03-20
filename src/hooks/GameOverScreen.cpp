@@ -25,7 +25,9 @@ using GameOverSetVisible_t = void(__fastcall*)(uint64_t* param_1, char param_2);
 // Addresses
 // ----------------------------------------------------
 
+//fox::ui::ModelNodeMesh::SetTextureName
 static constexpr uintptr_t ABS_SetTextureName = 0x141DC78F0ull;
+//tpp::ui::menu::GameOverEvCall::MainLayout::SetVisible
 static constexpr uintptr_t ABS_GameOverSetVisible = 0x145CB8890ull;
 
 // ----------------------------------------------------
@@ -52,8 +54,7 @@ static constexpr uint64_t TEX_BLUR_GZ = 0x156a20d598cc4802ull; //   \Assets\tpp\
 static void __fastcall hkGameOverSetVisible(uint64_t* param_1, char param_2)
 {
     g_OrigGameOverSetVisible(param_1, param_2);
-    if (MissionCodeGuard::ShouldBypassHooks())
-        return;
+    MISSION_GUARD_RETURN_VOID();
 
     if (param_2 == 0)
         return;
