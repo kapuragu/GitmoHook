@@ -253,7 +253,7 @@ namespace AddressSetRuntime
             0x0ull, // ExecCallback
             0x0ull, // FoxLuaRegisterLibrary
             0x0ull, // FoxPath_Path
-            0x0ull, // FoxStrHash32
+            0x142eb6c10ull, // FoxStrHash32
             0x14c96c490ull, // FoxStrHash64
             0x0ull, // GameOverSetVisible
             0x0ull, // GetCurrentMissionCode
@@ -327,10 +327,10 @@ namespace AddressSetRuntime
 			0x0ull, // EquipIdTableImpl_GetSupportWeaponTypeId
             0x0ull, // DeclareAMs
             
-            0x0ull, // GetChangeLocationMenuParameterByLocationId
-            0x0ull, // GetMbFreeChangeLocationMenuParameter
-            0x0ull, // GetPhotoAdditionalTextLangId
-            0x0ull, // HeliSoundControllerImplUpdate
+            0x147b88d00ull, // GetChangeLocationMenuParameterByLocationId
+            0x147b897d0ull, // GetMbFreeChangeLocationMenuParameter
+            0x140925910ull, // GetPhotoAdditionalTextLangId
+            0x140e24390ull, // HeliSoundControllerImplUpdate
         };
 
         return value;
