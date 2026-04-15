@@ -13,6 +13,7 @@
 
 #include <map>
 
+#include "AddressSet.h"
 #include "MissionCodeGuard.h"
 
 extern "C" {
@@ -70,7 +71,7 @@ unsigned long long __thiscall hkGetPhotoAdditionalTextLangId(MotherBaseMissionCo
 
 bool Install_PhotoAdditionalText_Hook()
 {
-    void* target = ResolveGameAddress(ABS_GetPhotoAdditionalTextLangId);
+    void* target = ResolveGameAddress(gAddr.GetPhotoAdditionalTextLangId);
 
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -84,7 +85,7 @@ bool Install_PhotoAdditionalText_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_PhotoAdditionalText_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_GetPhotoAdditionalTextLangId));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.GetPhotoAdditionalTextLangId));
     g_OrigGetPhotoAdditionalTextLangIdHook = nullptr;
     return true;
 }

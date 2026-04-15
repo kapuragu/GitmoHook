@@ -11,6 +11,7 @@
 
 #include <map>
 
+#include "AddressSet.h"
 #include "MissionCodeGuard.h"
 
 extern "C" {
@@ -55,7 +56,7 @@ static void __thiscall hkHeliSoundControllerImplUpdate(void* self)
 
 bool Install_HeliVoice_Hook()
 {
-    void* target = ResolveGameAddress(ABS_HeliSoundControllerImplUpdate);
+    void* target = ResolveGameAddress(gAddr.HeliSoundControllerImplUpdate);
     
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -69,7 +70,7 @@ bool Install_HeliVoice_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_HeliVoice_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_HeliSoundControllerImplUpdate));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.HeliSoundControllerImplUpdate));
     g_OrigHeliSoundControllerImplUpdate = nullptr;
     return true;
 }

@@ -12,6 +12,7 @@
 #include <map>
 
 #include "MissionCodeGuard.h"
+#include "AddressSet.h"
 
 extern "C" {
 #include "lua.h"
@@ -67,10 +68,10 @@ ChangeLocationMenuParameter* __thiscall hkGetChangeLocationMenuParameterByLocati
 
 bool Install_ChangeLocationMenu_Hook()
 {
-    void* target = ResolveGameAddress(ABS_GetChangeLocationMenuParameterByLocationId);
+    void* target = ResolveGameAddress(gAddr.GetChangeLocationMenuParameterByLocationId);
 
     g_OrigGetMbFreeChangeLocationMenuParameter = reinterpret_cast<GetMbFreeChangeLocationMenuParameter_t>(
-        ResolveGameAddress(ABS_GetMbFreeChangeLocationMenuParameter));
+        ResolveGameAddress(gAddr.GetMbFreeChangeLocationMenuParameter));
 
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -84,8 +85,8 @@ bool Install_ChangeLocationMenu_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_ChangeLocationMenu_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_GetChangeLocationMenuParameterByLocationId));
-    DisableAndRemoveHook(ResolveGameAddress(ABS_GetMbFreeChangeLocationMenuParameter));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.GetChangeLocationMenuParameterByLocationId));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.GetMbFreeChangeLocationMenuParameter));
     g_OrigGetChangeLocationMenuParameterByLocationId = nullptr;
     g_OrigGetMbFreeChangeLocationMenuParameter = nullptr;
     return true;

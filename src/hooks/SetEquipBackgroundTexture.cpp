@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <unordered_set>
 
+#include "AddressSet.h"
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
@@ -111,10 +112,11 @@ static void __fastcall hkSetTextureName(void* modelNodeMesh, uint64_t textureHas
 
             if (newTexture != 0)
             {
-                Log("[SetTextureName] location=40 equipId=%d: 0x%llX -> 0x%llX\n",
+                //gets called every frame its onscreen
+                /*Log("[SetTextureName] location=40 equipId=%d: 0x%llX -> 0x%llX\n",
                     g_CurrentEquipId,
                     static_cast<unsigned long long>(textureHash),
-                    static_cast<unsigned long long>(newTexture));
+                    static_cast<unsigned long long>(newTexture));*/
 
                 textureHash = newTexture;
             }
@@ -131,9 +133,9 @@ static void __fastcall hkSetTextureName(void* modelNodeMesh, uint64_t textureHas
 bool Install_SetEquipBackgroundTexture_Hook()
 {
     void* targetSetEquipBackgroundTexture =
-        ResolveGameAddress(ABS_SetEquipBackgroundTexture);
+        ResolveGameAddress(gAddr.SetEquipBackgroundTexture);
 
-    void* targetSetTextureName = ResolveGameAddress(ABS_SetTextureName);
+    void* targetSetTextureName = ResolveGameAddress(gAddr.SetTextureName);
     
     const bool okSetEquipBackgroundTexture = CreateAndEnableHook(
         targetSetEquipBackgroundTexture,
@@ -152,8 +154,8 @@ bool Install_SetEquipBackgroundTexture_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_SetEquipBackgroundTexture_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_SetEquipBackgroundTexture));
-    DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.SetEquipBackgroundTexture));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.SetTextureName));
     g_OrigSetEquipBackgroundTexture = nullptr;
     g_OrigSetTextureName = nullptr;
     return true;

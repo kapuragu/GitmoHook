@@ -155,6 +155,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="src\BuiltInModules.h" />
     <ClInclude Include="src\FeatureModule.h" />
+    <ClInclude Include="src\hooks\AddressSet.h" />
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
     <ClInclude Include="src\hooks\GetPhotoAdditionalTextLangId.h" />

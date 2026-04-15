@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <unordered_set>
 
+#include "AddressSet.h"
 #include "HookUtils.h"
 #include "log.h"
 #include "FoxHashes.h"
@@ -80,9 +81,9 @@ static void __fastcall hkLoadingScreenOrGameOverSplash2(void* param_1)
 bool Install_LoadingScreen_Hook()
 {
     g_SetTextureName = reinterpret_cast<SetTextureName_t>(
-        ResolveGameAddress(ABS_SetTextureName));
+        ResolveGameAddress(gAddr.SetTextureName));
 
-    void* target = ResolveGameAddress(ABS_LoadingScreenOrGameOverSplash2);
+    void* target = ResolveGameAddress(gAddr.LoadingScreenOrGameOverSplash2);
     
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -96,8 +97,8 @@ bool Install_LoadingScreen_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_LoadingScreen_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_LoadingScreenOrGameOverSplash2));
-    DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.LoadingScreenOrGameOverSplash2));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.SetTextureName));
     g_OrigLoadingScreenOrGameOverSplash2 = nullptr;
     g_SetTextureName = nullptr;
     return true;
