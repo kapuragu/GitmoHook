@@ -1,4 +1,12 @@
+#include "CautionStepNormalTimerHook.h"
+#include "HeliVoice.h"
+#include "LostHostageHook.h"
 #include "pch.h"
+#include "StepRadioDiscovery.h"
+#include "VIPHoldupHook.h"
+#include "VIPRadioHook.h"
+#include "VIPSleepFaintHook.h"
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -664,11 +672,154 @@ static int __cdecl l_AddPhotoAdditionalText(lua_State* L)
     return 1;
 }
 
+// Sets the caution timer override.
+// Params: seconds
+static int l_SetCautionStepNormalDurationSeconds(lua_State* L)
+{
+    const float seconds = GetLuaNumber(L, 1);
+    Set_CautionStepNormalDurationSeconds(seconds);
+    return 0;
+}
+
+// Gets the caution timer override.
+// Params: none
+static int l_GetCautionStepNormalDurationSeconds(lua_State* L)
+{
+    PushLuaNumber(L, Get_CautionStepNormalDurationSeconds());
+    return 1;
+}
+
+// Clears the caution timer override.
+// Params: none
+static int l_UnsetCautionStepNormalDurationSeconds(lua_State* L)
+{
+    UNREFERENCED_PARAMETER(L);
+    Unset_CautionStepNormalDurationSeconds();
+    return 0;
+}
+
+// Gets the remaining caution timer.
+// Params: none
+static int l_GetCautionStepNormalRemainingSeconds(lua_State* L)
+{
+    PushLuaNumber(L, Get_CautionStepNormalRemainingSeconds());
+    return 1;
+}
+
+// Adds one lost hostage.
+// Params: gameObjectId, hostageType
+static int __cdecl l_SetLostHostage(lua_State* L)
+{
+    const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+    const int hostageType = GetLuaInt(L, 2);
+
+    Add_LostHostageTrap(gameObjectId, hostageType);
+    Add_LostHostageDiscovery(gameObjectId, hostageType);
+    return 0;
+}
+
+// Removes one lost hostage.
+// Params: gameObjectId
+static int __cdecl l_RemoveLostHostage(lua_State* L)
+{
+    const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+
+    Remove_LostHostageTrap(gameObjectId);
+    Remove_LostHostageDiscovery(gameObjectId);
+    return 0;
+}
+
+// Clears all lost hostages.
+// Params: none
+static int __cdecl l_ClearLostHostages(lua_State* L)
+{
+    UNREFERENCED_PARAMETER(L);
+    Clear_LostHostagesTrap();
+    Clear_LostHostageDiscovery();
+    return 0;
+}
+
+static int __cdecl l_SetLostHostageFromPlayer(lua_State* L)
+{
+    const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+    const bool playerTookHostage = GetLuaBool(L, 2);
+    PlayerTookHostage(gameObjectId, playerTookHostage);
+    return 0;
+}
+
+// Marks one VIP-important soldier.
+// Params: gameObjectId, isOfficer
+static int __cdecl l_SetVIPImportant(lua_State* L)
+{
+    const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+    const bool isOfficer = GetLuaBool(L, 2);
+
+    Add_VIPSleepFaintImportantGameObjectId(gameObjectId, isOfficer);
+    Add_VIPHoldupImportantGameObjectId(gameObjectId, isOfficer);
+    Add_VIPRadioImportantGameObjectId(gameObjectId, isOfficer);
+    return 0;
+}
+
+// Removes one VIP-important soldier.
+// Params: gameObjectId
+static int __cdecl l_RemoveVIPImportant(lua_State* L)
+{
+    const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+
+    Remove_VIPSleepFaintImportantGameObjectId(gameObjectId);
+    Remove_VIPHoldupImportantGameObjectId(gameObjectId);
+    Remove_VIPRadioImportantGameObjectId(gameObjectId);
+    return 0;
+}
+
+// Clears all VIP-important soldiers.
+// Params: none
+static int __cdecl l_ClearVIPImportant(lua_State* L)
+{
+    UNREFERENCED_PARAMETER(L);
+
+    Clear_VIPSleepFaintImportantGameObjectIds();
+    Clear_VIPHoldupImportantGameObjectIds();
+    Clear_VIPRadioImportantGameObjectIds();
+    return 0;
+}
+
+static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
+{
+    const bool isEnable = GetLuaBool(L, 1);
+    if (isEnable)
+    {
+        const char* dialogueEvent1 = GetLuaString(L, 2);
+        const char* dialogueEvent2 = GetLuaString(L, 3);
+        bool success = SetEnableHeliVoice(isEnable,dialogueEvent1,dialogueEvent2);
+        return success ? 1 : 0;
+    }
+    
+    bool success = SetEnableHeliVoice(isEnable,"","");
+    return success ? 1 : 0;
+}
+
 static luaL_Reg g_GitmoHook[] =
 {   //SetDefaultEquipBgTexturePath is the one that is going to be used in lua.
     { "SetEnableGzUi", l_SetEnableGzUi },
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
+        
+    { "SetCautionStepNormalDurationSeconds",    l_SetCautionStepNormalDurationSeconds },
+    { "GetCautionStepNormalDurationSeconds",    l_GetCautionStepNormalDurationSeconds },
+    { "UnsetCautionStepNormalDurationSeconds",  l_UnsetCautionStepNormalDurationSeconds },
+    { "GetCautionStepNormalRemainingSeconds",   l_GetCautionStepNormalRemainingSeconds },
+    //e20010
+    { "SetLostHostage", l_SetLostHostage },
+    { "RemoveLostHostage", l_RemoveLostHostage },
+    { "ClearLostHostages", l_ClearLostHostages },
+    { "SetLostHostageFromPlayer", l_SetLostHostageFromPlayer },
+    //e20020
+    { "SetVIPImportant", l_SetVIPImportant },
+    { "RemoveVIPImportant", l_RemoveVIPImportant },
+    { "ClearVIPImportant", l_ClearVIPImportant },
+    
+    { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },
     { nullptr, nullptr }
 };
 

@@ -20,63 +20,85 @@ extern "C" {
 #include "lualib.h"
 }
 
-using HeliSoundControllerImplUpdate_t = void(__thiscall*)(void* self);
-
-// ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-//tpp::gm::heli::impl::SoundControllerImpl::Update 140e242c0
-static constexpr uintptr_t ABS_HeliSoundControllerImplUpdate = 0x140e242c0ull;
-static constexpr uintptr_t ABS_DD_vox_SH_voice = 0x140e2470full;
-static constexpr uintptr_t ABS_DD_vox_SH_radio = 0x140e24707ull;
-static constexpr uintptr_t ABS_DD_vox_SH_radio2 = 0x140e246ffull;
+using FNVHash32_t = unsigned int(__fastcall*)(const char * strToHash);
 
 // ----------------------------------------------------
 // Original pointers
 // ----------------------------------------------------
-
-static HeliSoundControllerImplUpdate_t g_OrigHeliSoundControllerImplUpdate = nullptr;
+    
+static FNVHash32_t g_FNVHash32 = nullptr;
 
 // ----------------------------------------------------
 // Context
 // ----------------------------------------------------
 
-bool g_isEnableHeliVoice = false;
+static const char* DD_vox_SH_voice = "DD_vox_SH_voice";
+static const char* DD_vox_SH_radio = "DD_vox_SH_radio";
 
-static void __thiscall hkHeliSoundControllerImplUpdate(void* self)
+unsigned int GetFNVHash32(const char * strToHash)
 {
-    g_OrigHeliSoundControllerImplUpdate(self);
-    if (!g_isEnableHeliVoice)
-        return;
-    const std::uintptr_t base = reinterpret_cast<std::uintptr_t>(self);
-    const std::uintptr_t lVar15 = (base + 0x58);
-    const std::uintptr_t quarkDesc = (base + 0x60);
-}
+    unsigned int ret = (unsigned int)-1;
 
-bool Install_HeliVoice_Hook()
-{
-    void* target = ResolveGameAddress(gAddr.HeliSoundControllerImplUpdate);
+    if (!g_FNVHash32)
+        g_FNVHash32 = reinterpret_cast<FNVHash32_t>(ResolveGameAddress(gAddr.FNVHash32));
     
-    const bool okTarget = CreateAndEnableHook(
-        target,
-        reinterpret_cast<void*>(&hkHeliSoundControllerImplUpdate),
-        reinterpret_cast<void**>(&g_OrigHeliSoundControllerImplUpdate));
-
-    Log("[Hook] GameOverScreen hook installed? %p\n", okTarget);
-    return okTarget;
+    if (g_FNVHash32)
+        ret = g_FNVHash32(strToHash);
+    
+    Log("[HeliVoice] GetFNVHash32(%s)=%d\n",strToHash,ret);
+    
+    return ret;
 }
 
-// Removes the SetLuaFunctions hook.
-bool Uninstall_HeliVoice_Hook()
+bool TogglePatch(bool isEnable, uintptr_t pointer, unsigned int originalHash, unsigned int enabledHash)
 {
-    DisableAndRemoveHook(ResolveGameAddress(gAddr.HeliSoundControllerImplUpdate));
-    g_OrigHeliSoundControllerImplUpdate = nullptr;
-    return true;
+    
+    void* target = ResolveGameAddress(pointer);
+    if (!target)
+    {
+        Log("[HeliVoice] TogglePatch(%s): ResolveGameAddress @%lu null\n",
+            isEnable ? "true" : "false", pointer);
+        return false;
+    }
+
+    DWORD oldProtect = 0;
+    if (!VirtualProtect(target, sizeof(unsigned int), PAGE_EXECUTE_READWRITE, &oldProtect))
+    {
+        Log("[HeliVoice] TogglePatch(%s): VirtualProtect failed @%lu (err=%lu)\n",
+            isEnable ? "true" : "false", pointer, GetLastError());
+        return false;
+    }
+    
+    std::uint8_t* enabledBytes = static_cast<std::uint8_t*>(static_cast<void*>(&enabledHash));
+    std::uint8_t* originalBytes = static_cast<std::uint8_t*>(static_cast<void*>(&originalHash));
+    
+    std::uint8_t* src = isEnable ? enabledBytes : originalBytes;
+    std::memcpy(target, src, sizeof(originalHash));
+
+    DWORD restored = 0;
+    VirtualProtect(target, sizeof(originalHash), oldProtect, &restored);
+    FlushInstructionCache(GetCurrentProcess(), target, sizeof(originalHash));
+
+    Log("[HeliVoice] TogglePatch(%s): wrote at %p\n",
+        isEnable ? "true" : "false", target);
 }
 
-void SetEnableHeliVoice(bool isEnable)
+bool SetEnableHeliVoice(bool isEnable, const char *DD_vox_SH_voice_new, const char *DD_vox_SH_radio_new)
 {
-    g_isEnableHeliVoice = isEnable;
+    Log("[GitmoHook] SetEnableHeliVoice start\n");
+    
+    unsigned int original_DD_vox_SH_voice_hash = GetFNVHash32(DD_vox_SH_voice);
+    unsigned int new_DD_vox_SH_voice_hash = GetFNVHash32(DD_vox_SH_voice_new);
+    
+    unsigned int original_DD_vox_SH_radio_hash = GetFNVHash32(DD_vox_SH_radio);
+    unsigned int new_DD_vox_SH_radio_hash = GetFNVHash32(DD_vox_SH_radio_new);
+    
+    bool success0 = TogglePatch(isEnable, gAddr.DD_vox_SH_voice, original_DD_vox_SH_voice_hash, new_DD_vox_SH_voice_hash);
+    bool success1 = TogglePatch(isEnable, gAddr.DD_vox_SH_radio, original_DD_vox_SH_radio_hash, new_DD_vox_SH_radio_hash);
+    bool success2 = TogglePatch(isEnable, gAddr.DD_vox_SH_radio2, original_DD_vox_SH_radio_hash, new_DD_vox_SH_radio_hash);
+    bool success3 = TogglePatch(isEnable, gAddr.DD_vox_SH_radio3, original_DD_vox_SH_radio_hash, new_DD_vox_SH_radio_hash);
+    
     Log("[GitmoHook] SetEnableHeliVoice set\n");
+    
+    return (success0 && success1 && success2 && success3);
 }

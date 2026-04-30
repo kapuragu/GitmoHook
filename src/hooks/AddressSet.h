@@ -114,7 +114,15 @@ namespace AddressSetRuntime
         uintptr_t GetChangeLocationMenuParameterByLocationId = 0;
         uintptr_t GetMbFreeChangeLocationMenuParameter = 0;
         uintptr_t GetPhotoAdditionalTextLangId = 0;
-        uintptr_t HeliSoundControllerImplUpdate = 0;
+        
+        uintptr_t FNVHash32 = 0;
+        
+        //tpp::gm::heli::impl::SoundControllerImpl::Update 140e242c0
+        uintptr_t DD_vox_SH_voice = 0;
+        uintptr_t DD_vox_SH_radio = 0;
+        uintptr_t DD_vox_SH_radio2 = 0;
+        uintptr_t DD_vox_SH_radio3 = 0;
+        
     };
 
     inline GameBuild& GetGameBuild()
@@ -192,6 +200,7 @@ namespace AddressSetRuntime
             0x1404D2770ull, // SubtitleManager_Get
             0x149F65330ull, // UpdateOptCamo
             0x142C009F0ull, // g_SoundSystem
+            
             0x14C1D7320ull, // lua_getfield
             0x14C1D7D40ull, // lua_gettop
             0x14C1D8C90ull, // lua_isnumber
@@ -226,7 +235,13 @@ namespace AddressSetRuntime
             0x145F785D0ull, // GetChangeLocationMenuParameterByLocationId
             0x145F78B90ull, // GetMbFreeChangeLocationMenuParameter
             0x140925ef0ull, // GetPhotoAdditionalTextLangId
-            0x140e242c0ull, // HeliSoundControllerImplUpdate
+            
+            0x143f33a20ull,//FNVHash32
+            
+            0x140e2470full,//DD_vox_SH_voice
+            0x140e24682ull,//DD_vox_SH_radio
+            0x140e246ffull,//DD_vox_SH_radio2
+            0x140e24707ull,//DD_vox_SH_radio3
         };
 
         return value;
@@ -295,8 +310,9 @@ namespace AddressSetRuntime
             0x0ull, // SubtitleManager_Get
             0x0ull, // UpdateOptCamo
             0x0ull, // g_SoundSystem
+            
             0x14c987300ull, // lua_getfield
-            0x0ull, // lua_gettop
+            0x14C987CB0ull, // lua_gettop
             0x14c988960ull, // lua_isnumber
             0x14c988ca0ull, // lua_isstring
             0x14c98a230ull, // lua_objlen
@@ -325,12 +341,18 @@ namespace AddressSetRuntime
 			0x0ull, // TppMotherBaseManagement_RegCstDev
 			0x0ull, // TppMotherBaseManagement_RegFlwDev
 			0x0ull, // EquipIdTableImpl_GetSupportWeaponTypeId
-            0x0ull, // DeclareAMs
+            0x1480EE6F0ull, // DeclareAMs
             
             0x147b88d00ull, // GetChangeLocationMenuParameterByLocationId
             0x147b897d0ull, // GetMbFreeChangeLocationMenuParameter
             0x140925910ull, // GetPhotoAdditionalTextLangId
-            0x140e24390ull, // HeliSoundControllerImplUpdate
+            
+            0x143f6ee50ull,//FNVHash32
+            
+            0x140e247dfull,//DD_vox_SH_voice
+            0x140e24752ull,//DD_vox_SH_radio
+            0x140e247cfull,//DD_vox_SH_radio2
+            0x140e247d7ull,//DD_vox_SH_radio3
         };
 
         return value;
