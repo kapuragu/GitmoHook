@@ -52,8 +52,8 @@ static constexpr std::uint32_t LABEL_MALE_NOT_TAKEN = 0xFA42F4E9u;
 static constexpr std::uint32_t LABEL_MALE_TAKEN = 0x43ED2D08u;
 static constexpr std::uint32_t LABEL_FEMALE_NOT_TAKEN = 0xBAE03A98u;
 static constexpr std::uint32_t LABEL_FEMALE_TAKEN = 0xD586CA7Bu;
-static constexpr std::uint32_t LABEL_CHILD_NOT_TAKEN = 0x2A2B54E0u;
-static constexpr std::uint32_t LABEL_CHILD_TAKEN = 0x96902568u;
+static constexpr std::uint32_t LABEL_CHILD_NOT_TAKEN = 0x643443d2u;//rlc "CPR0271"
+static constexpr std::uint32_t LABEL_CHILD_TAKEN = 0x96902568u;//rlc "CPR0063"
 
 
 // ============================================================

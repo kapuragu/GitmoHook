@@ -152,12 +152,15 @@
     <ClInclude Include="include\luaconf.h" />
     <ClInclude Include="include\lualib.h" />
     <ClInclude Include="include\MinHook.h" />
+    <ClInclude Include="include\patch.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="src\BuiltInModules.h" />
     <ClInclude Include="src\FeatureModule.h" />
     <ClInclude Include="src\hooks\AddressSet.h" />
     <ClInclude Include="src\hooks\CautionStepNormalTimerHook.h" />
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
+    <ClInclude Include="src\hooks\FNVHash32.h" />
+    <ClInclude Include="src\hooks\GameOverMusic.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
     <ClInclude Include="src\hooks\GetPhotoAdditionalTextLangId.h" />
     <ClInclude Include="src\hooks\HeliVoice.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="src\hooks\LostHostageHook.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
+    <ClInclude Include="src\hooks\SoldierRtpcHook.h" />
     <ClInclude Include="src\hooks\State_EnterStandHoldup1.h" />
     <ClInclude Include="src\hooks\StepRadioDiscovery.h" />
     <ClInclude Include="src\hooks\VIPHoldupHook.h" />
@@ -175,6 +179,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="include\FoxHashes.cpp" />
     <ClCompile Include="include\log.cpp" />
+    <ClCompile Include="include\patch.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -185,6 +190,8 @@
     <ClCompile Include="src\FeatureModule.cpp" />
     <ClCompile Include="src\hooks\CautionStepNormalTimerHook.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
+    <ClCompile Include="src\hooks\FNVHash32.cpp" />
+    <ClCompile Include="src\hooks\GameOverMusic.cpp" />
     <ClCompile Include="src\hooks\GameOverScreen.cpp" />
     <ClCompile Include="src\hooks\GetPhotoAdditionalTextLangId.cpp" />
     <ClCompile Include="src\hooks\HeliVoice.cpp" />
@@ -193,6 +200,7 @@
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\hooks\SetLuaFunctions.cpp" />
+    <ClCompile Include="src\hooks\SoldierRtpcHook.cpp" />
     <ClCompile Include="src\hooks\State_EnterStandHoldup1.cpp" />
     <ClCompile Include="src\hooks\State_StandHoldupCancelLookToPlayer.cpp" />
     <ClCompile Include="src\hooks\StepRadioDiscovery.cpp" />

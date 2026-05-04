@@ -1,7 +1,9 @@
 #include "CautionStepNormalTimerHook.h"
+#include "GameOverMusic.h"
 #include "HeliVoice.h"
 #include "LostHostageHook.h"
 #include "pch.h"
+#include "SoldierRtpcHook.h"
 #include "StepRadioDiscovery.h"
 #include "VIPHoldupHook.h"
 #include "VIPRadioHook.h"
@@ -672,6 +674,21 @@ static int __cdecl l_AddPhotoAdditionalText(lua_State* L)
     return 1;
 }
 
+static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
+{
+    const bool isEnable = GetLuaBool(L, 1);
+    if (isEnable)
+    {
+        const char* dialogueEvent1 = GetLuaString(L, 2);
+        const char* dialogueEvent2 = GetLuaString(L, 3);
+        bool success = SetEnableHeliVoice(isEnable,dialogueEvent1,dialogueEvent2);
+        return success ? 1 : 0;
+    }
+    
+    bool success = SetEnableHeliVoice(isEnable,"","");
+    return success ? 1 : 0;
+}
+
 // Sets the caution timer override.
 // Params: seconds
 static int l_SetCautionStepNormalDurationSeconds(lua_State* L)
@@ -784,18 +801,31 @@ static int __cdecl l_ClearVIPImportant(lua_State* L)
     return 0;
 }
 
-static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
+static int __cdecl l_SetSoldierRtpc(lua_State* L)
+{
+    const std::uint32_t goId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+    const char* rtpcName = GetLuaString(L, 2);
+    const float value = GetLuaNumber(L, 3);
+    const long timeMs = static_cast<long>(GetLuaInt(L, 4));
+
+    const int result = SoldierRtpc::SetSoldierRtpc(goId, rtpcName, value, timeMs);
+    PushLuaNumber(L, static_cast<float>(result));
+    return 1;
+}
+
+static int __cdecl l_SetGameOverMusic(lua_State* L)
 {
     const bool isEnable = GetLuaBool(L, 1);
+    const GAME_OVER_TYPE gameOverType = static_cast<GAME_OVER_TYPE>(GetLuaInt(L, 2));
     if (isEnable)
     {
-        const char* dialogueEvent1 = GetLuaString(L, 2);
-        const char* dialogueEvent2 = GetLuaString(L, 3);
-        bool success = SetEnableHeliVoice(isEnable,dialogueEvent1,dialogueEvent2);
+        const char* playEventString = GetLuaString(L, 3);
+        const char* stopEventString = GetLuaString(L, 4);
+        bool success = SetGameOverMusic(isEnable,gameOverType,playEventString,stopEventString);
         return success ? 1 : 0;
     }
     
-    bool success = SetEnableHeliVoice(isEnable,"","");
+    bool success = SetGameOverMusic(isEnable,gameOverType,"","");
     return success ? 1 : 0;
 }
 
@@ -804,11 +834,14 @@ static luaL_Reg g_GitmoHook[] =
     { "SetEnableGzUi", l_SetEnableGzUi },
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
+    { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },
         
     { "SetCautionStepNormalDurationSeconds",    l_SetCautionStepNormalDurationSeconds },
     { "GetCautionStepNormalDurationSeconds",    l_GetCautionStepNormalDurationSeconds },
     { "UnsetCautionStepNormalDurationSeconds",  l_UnsetCautionStepNormalDurationSeconds },
     { "GetCautionStepNormalRemainingSeconds",   l_GetCautionStepNormalRemainingSeconds },
+    
+    { "SetGameOverMusic", l_SetGameOverMusic },
     //e20010
     { "SetLostHostage", l_SetLostHostage },
     { "RemoveLostHostage", l_RemoveLostHostage },
@@ -818,8 +851,7 @@ static luaL_Reg g_GitmoHook[] =
     { "SetVIPImportant", l_SetVIPImportant },
     { "RemoveVIPImportant", l_RemoveVIPImportant },
     { "ClearVIPImportant", l_ClearVIPImportant },
-    
-    { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },
+    { "SetSoldierRtpc", l_SetSoldierRtpc },
     { nullptr, nullptr }
 };
 

@@ -31,7 +31,7 @@ namespace
 
     static constexpr std::uint32_t LHD_LABEL_MALE = 0x247b3defu;
     static constexpr std::uint32_t LHD_LABEL_FEMALE = 0xa2c4a6ecu;
-    static constexpr std::uint32_t LHD_LABEL_CHILD = 0x100eb512u;
+    static constexpr std::uint32_t LHD_LABEL_CHILD = 0x40e42b38u;//rlc "CPR0283_"
 
     static CheckSightNoticeHostage_t g_LHD_OrigCheckSightNoticeHostage = nullptr;
     static StepRadioDiscovery_t      g_LHD_OrigStepRadioDiscovery = nullptr;

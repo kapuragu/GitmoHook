@@ -87,6 +87,24 @@ namespace AddressSetRuntime
         uintptr_t DD_vox_SH_radio2 = 0;
         uintptr_t DD_vox_SH_radio3 = 0;
         
+        uintptr_t AK_SoundEngine_SetRTPCValue = 0;
+        uintptr_t Fox_Sd_ConvertParameterID = 0;
+
+        //tpp::ui::menu::GameOverEvCall::PlayBgm
+        uintptr_t Play_bgm_gameover = 0;
+        uintptr_t Play_bgm_gameover_paradox = 0;
+        uintptr_t Play_bgm_gameover_perfectstealth = 0;
+        uintptr_t Play_bgm_s10010_gameover = 0;
+
+        //tpp::ui::menu::GameOverEvCall::StopBgm
+        uintptr_t Stop_bgm_gameover = 0;
+        uintptr_t Stop_bgm_gameover_paradox = 0;
+        uintptr_t Stop_bgm_gameover_perfectstealth = 0;
+        uintptr_t Stop_bgm_s10010_gameover = 0;
+        
+        //soundId
+        uintptr_t Play_bgm_gameover_paradox_soundId = 0;
+        uintptr_t Stop_bgm_gameover_paradox_soundId = 0;
     };
 
     inline GameBuild& GetGameBuild()
@@ -169,6 +187,25 @@ namespace AddressSetRuntime
             0x140e24682ull,//DD_vox_SH_radio
             0x140e246ffull,//DD_vox_SH_radio2
             0x140e24707ull,//DD_vox_SH_radio3
+            
+            0x14033d520ull, // AK_SoundEngine_SetRTPCValue (thunk → AK::SoundEngine::SetRTPCValue)
+            0x14032adf0ull, // Fox_Sd_ConvertParameterID (thunk → fox::sd::ConvertParameterID; RTPC/Switch/State name hash)
+
+            //tpp::ui::menu::GameOverEvCall::PlayBgm
+            0x145cb70bdull,//Play_bgm_gameover
+            0x145cb70c4ull,//Play_bgm_gameover_paradox
+            0x145cb70b6ull,//Play_bgm_gameover_perfectstealth
+            0x145cb70cbull,//Play_bgm_s10010_gameover
+
+            //tpp::ui::menu::GameOverEvCall::StopBgm
+            0x145cb8ef5ull,//Stop_bgm_gameover 
+            0x145cb8f06ull,//Stop_bgm_gameover_paradox
+            0x145cb8efaull,//Stop_bgm_gameover_perfectstealth
+            0x145cb8f0dull,//Stop_bgm_s10010_gameover
+        
+            //soundId
+            0x14226bfc8ull,//Play_bgm_gameover_paradox_soundId
+            0x14226bfccull,//Stop_bgm_gameover_paradox_soundId
         };
 
         return value;
@@ -242,6 +279,25 @@ namespace AddressSetRuntime
             0x140e24752ull,//DD_vox_SH_radio
             0x140e247cfull,//DD_vox_SH_radio2
             0x140e247d7ull,//DD_vox_SH_radio3
+            
+            0x14033cfc0ull, // AK_SoundEngine_SetRTPCValue
+            0x14032a870ull, // Fox_Sd_ConvertParameterID
+
+            //tpp::ui::menu::GameOverEvCall::PlayBgm
+            0x1477cd50dull,//Play_bgm_gameover
+            0x1477cd514ull,//Play_bgm_gameover_paradox
+            0x1477cd506ull,//Play_bgm_gameover_perfectstealth
+            0x1477cd51bull,//Play_bgm_s10010_gameover
+
+            //tpp::ui::menu::GameOverEvCall::StopBgm
+            0x1477d0275ull,//Stop_bgm_gameover 
+            0x1477d0286ull,//Stop_bgm_gameover_paradox
+            0x1477d027aull,//Stop_bgm_gameover_perfectstealth
+            0x1477d028dull,//Stop_bgm_s10010_gameover
+        
+            //soundId
+            0x14226bf18ull,//Play_bgm_gameover_paradox_soundId
+            0x145cb8f0dull,//Stop_bgm_gameover_paradox_soundId
         };
 
         return value;

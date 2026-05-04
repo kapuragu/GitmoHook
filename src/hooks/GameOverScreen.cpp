@@ -1,17 +1,15 @@
-﻿#include "pch.h"
+﻿#include "GameOverScreen.h"
+
+#include "pch.h"
 #include <Windows.h>
 #include <cstdint>
-#include <unordered_set>
 
+#include "AddressSet.h"
 #include "HookUtils.h"
 #include "log.h"
-#include "FoxHashes.h"
 #include "MissionCodeGuard.h"
 
 extern "C" {
-    #include "lua.h"
-    #include "lauxlib.h"
-    #include "lualib.h"
 }
 
 // ----------------------------------------------------
@@ -86,9 +84,9 @@ static void __fastcall hkGameOverSetVisible(uint64_t* param_1, char param_2)
 bool Install_GameOverScreen_Hook()
 {
     g_SetTextureName = reinterpret_cast<SetTextureName_t>(
-        ResolveGameAddress(ABS_SetTextureName));
+        ResolveGameAddress(gAddr.SetTextureName));
 
-    void* target = ResolveGameAddress(ABS_GameOverSetVisible);
+    void* target = ResolveGameAddress(gAddr.GameOverSetVisible);
     
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -102,8 +100,8 @@ bool Install_GameOverScreen_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_GameOverScreen_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(ABS_SetTextureName));
-    DisableAndRemoveHook(ResolveGameAddress(ABS_GameOverSetVisible));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.SetTextureName));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.GameOverSetVisible));
     g_SetTextureName = nullptr;
     g_OrigGameOverSetVisible = nullptr;
     return true;
