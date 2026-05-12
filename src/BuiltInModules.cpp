@@ -384,7 +384,7 @@ void RegisterBuiltInFeatureModules()
     static CautionTimerModule s_CautionTimerModule;
     static HoldUpReactionCowardlyReactionsModule s_HoldUpReactionCowardlyReactionsModule;
     
-    /*static LostHostageModule s_LostHostageModule;*/
+    static LostHostageModule s_LostHostageModule;
 
     static VIPSleepFaintModule s_VIPSleepFaintModule;
     static VIPHoldupModule s_VIPHoldupModule;
@@ -409,7 +409,7 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_VIPSoundRecoveryModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPRadioModule);
             FeatureModuleRegistry::Instance().Register(&s_HoldUpReactionCowardlyReactionsModule);
-            /*FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);*/
+            FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
             FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
             FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
             FeatureModuleRegistry::Instance().Register(&s_VoicePitchOverrideModule);

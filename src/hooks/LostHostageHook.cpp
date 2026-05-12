@@ -167,6 +167,7 @@ static bool LoadGetQuarkSystemTable()
     if (!g_GetQuarkSystemTable)
         g_GetQuarkSystemTable = reinterpret_cast<GetQuarkSystemTable_t>(
             ResolveGameAddress(gAddr.GetQuarkSystemTable));
+    Log("GetQuarkSystemTable: @%p\n",gAddr.GetQuarkSystemTable);
     return g_GetQuarkSystemTable != nullptr;
 }
 
