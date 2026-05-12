@@ -17,4 +17,7 @@ namespace FoxHashes
 
     uint64_t PathCode64Ext(const char* path);
     uint64_t PathCode64Ext(const std::string& path);
+
+    uint32_t FNVHash32(const char* text);
+    uint32_t FNVHash32(const std::string& text);
 }

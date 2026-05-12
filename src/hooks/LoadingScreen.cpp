@@ -18,16 +18,6 @@ extern "C" {
 using LoadingScreenOrGameOverSplash2_t = void(__fastcall*)(void* param_1);
 using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk);
 
-// ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-//ui::loading::LoadingScreenOrGameOverSplash2
-static constexpr uintptr_t ABS_LoadingScreenOrGameOverSplash2 = 0x145CD0630ull;
-//fox::ui::ModelNodeMesh::SetTextureName
-static constexpr uintptr_t ABS_SetTextureName = 0x141DC78F0ull;
-
-
 static LoadingScreenOrGameOverSplash2_t g_OrigLoadingScreenOrGameOverSplash2 = nullptr;
 static SetTextureName_t g_SetTextureName = nullptr;
 
@@ -35,7 +25,7 @@ static SetTextureName_t g_SetTextureName = nullptr;
 // Context
 // ----------------------------------------------------
 
-static bool g_isEnableLoadingScreen = false;
+static bool g_isEnableTelopBg = false;
 
 // Cyprus textures
 static constexpr uint64_t TEX_LOADING_MAIN_CYPRUS   = 0x15693e01563c09c3ull; //   \Assets\tpp\common_source\ui\common_texture\cm_mblogo_clp_1.ftex
@@ -51,7 +41,7 @@ static void __fastcall hkLoadingScreenOrGameOverSplash2(void* param_1)
     
     MISSION_GUARD_RETURN_VOID();
 
-    if (!g_isEnableLoadingScreen)
+    if (!g_isEnableTelopBg)
         return;
 
     Log("[LoadingScreenOrGameOverSplash2] Applying Cyprus textures\n");
@@ -83,7 +73,7 @@ bool Install_LoadingScreen_Hook()
     g_SetTextureName = reinterpret_cast<SetTextureName_t>(
         ResolveGameAddress(gAddr.SetTextureName));
 
-    void* target = ResolveGameAddress(gAddr.LoadingScreenOrGameOverSplash2);
+    void* target = ResolveGameAddress(gAddr.LoadingTipsEvUpdateInitPhase);
     
     const bool okTarget = CreateAndEnableHook(
         target,
@@ -97,7 +87,7 @@ bool Install_LoadingScreen_Hook()
 // Removes the SetLuaFunctions hook.
 bool Uninstall_LoadingScreen_Hook()
 {
-    DisableAndRemoveHook(ResolveGameAddress(gAddr.LoadingScreenOrGameOverSplash2));
+    DisableAndRemoveHook(ResolveGameAddress(gAddr.LoadingTipsEvUpdateInitPhase));
     DisableAndRemoveHook(ResolveGameAddress(gAddr.SetTextureName));
     g_OrigLoadingScreenOrGameOverSplash2 = nullptr;
     g_SetTextureName = nullptr;
@@ -106,6 +96,6 @@ bool Uninstall_LoadingScreen_Hook()
 
 void SetEnableLoadingScreen(const bool isEnable)
 {
-    g_isEnableLoadingScreen = isEnable;
+    g_isEnableTelopBg = isEnable;
     Log("[GitmoHook] SetEnableLoadingScreen set\n");
 }

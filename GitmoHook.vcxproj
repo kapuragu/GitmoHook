@@ -159,7 +159,6 @@
     <ClInclude Include="src\hooks\AddressSet.h" />
     <ClInclude Include="src\hooks\CautionStepNormalTimerHook.h" />
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
-    <ClInclude Include="src\hooks\FNVHash32.h" />
     <ClInclude Include="src\hooks\GameOverMusic.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
     <ClInclude Include="src\hooks\GetPhotoAdditionalTextLangId.h" />
@@ -168,12 +167,17 @@
     <ClInclude Include="src\hooks\LostHostageHook.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
-    <ClInclude Include="src\hooks\SoldierRtpcHook.h" />
+    <ClInclude Include="src\hooks\SoldierAkObjIdMap.h" />
+    <ClInclude Include="src\hooks\SoldierObjectRtpc.h" />
+    <ClInclude Include="src\hooks\SoldierVoiceTypeQuery.h" />
     <ClInclude Include="src\hooks\State_EnterStandHoldup1.h" />
     <ClInclude Include="src\hooks\StepRadioDiscovery.h" />
+    <ClInclude Include="src\hooks\TelopStartTitleSetBgTexture.h" />
     <ClInclude Include="src\hooks\VIPHoldupHook.h" />
     <ClInclude Include="src\hooks\VIPRadioHook.h" />
     <ClInclude Include="src\hooks\VIPSleepFaintHook.h" />
+    <ClInclude Include="src\hooks\VIPSoundRecoveryHook.h" />
+    <ClInclude Include="src\hooks\VoicePitchOverride.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -190,7 +194,6 @@
     <ClCompile Include="src\FeatureModule.cpp" />
     <ClCompile Include="src\hooks\CautionStepNormalTimerHook.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
-    <ClCompile Include="src\hooks\FNVHash32.cpp" />
     <ClCompile Include="src\hooks\GameOverMusic.cpp" />
     <ClCompile Include="src\hooks\GameOverScreen.cpp" />
     <ClCompile Include="src\hooks\GetPhotoAdditionalTextLangId.cpp" />
@@ -200,13 +203,18 @@
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\hooks\SetLuaFunctions.cpp" />
-    <ClCompile Include="src\hooks\SoldierRtpcHook.cpp" />
+    <ClCompile Include="src\hooks\SoldierAkObjIdMap.cpp" />
+    <ClCompile Include="src\hooks\SoldierObjectRtpc.cpp" />
+    <ClCompile Include="src\hooks\SoldierVoiceTypeQuery.cpp" />
     <ClCompile Include="src\hooks\State_EnterStandHoldup1.cpp" />
     <ClCompile Include="src\hooks\State_StandHoldupCancelLookToPlayer.cpp" />
     <ClCompile Include="src\hooks\StepRadioDiscovery.cpp" />
+    <ClCompile Include="src\hooks\TelopStartTitleSetBgTexture.cpp" />
     <ClCompile Include="src\hooks\VIPHoldupHook.cpp" />
     <ClCompile Include="src\hooks\VIPRadioHook.cpp" />
     <ClCompile Include="src\hooks\VIPSleepFaintHook.cpp" />
+    <ClCompile Include="src\hooks\VIPSoundRecoveryHook.cpp" />
+    <ClCompile Include="src\hooks\VoicePitchOverride.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\libMinHook.x64.lib" />

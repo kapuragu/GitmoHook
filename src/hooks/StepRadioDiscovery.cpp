@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <mutex>
 #include <array>
-#include <deque>
 
 #include "HookUtils.h"
 #include "log.h"
@@ -31,7 +30,7 @@ namespace
 
     static constexpr std::uint32_t LHD_LABEL_MALE = 0x247b3defu;
     static constexpr std::uint32_t LHD_LABEL_FEMALE = 0xa2c4a6ecu;
-    static constexpr std::uint32_t LHD_LABEL_CHILD = 0x40e42b38u;//rlc "CPR0283_"
+    static constexpr std::uint32_t LHD_LABEL_CHILD = 0x100eb512u;
 
     static CheckSightNoticeHostage_t g_LHD_OrigCheckSightNoticeHostage = nullptr;
     static StepRadioDiscovery_t      g_LHD_OrigStepRadioDiscovery = nullptr;
@@ -41,7 +40,7 @@ namespace
         std::uint16_t rawGameObjectId = LHD_INVALID_TARGET_ID;
         int           hostageType = -1;
         std::uint32_t speechLabel = 0u;
-    }; 
+    };
 
     struct LostHostageDiscoveryRadioRequestEntryView
     {
@@ -69,7 +68,8 @@ namespace
     std::unordered_map<std::uint32_t, std::uint16_t> g_LHD_LastCandidateTargetBySoldier;
     std::unordered_map<std::uint32_t, std::uint16_t> g_LHD_LastConfirmedTargetBySoldier;
     static std::mutex g_LHD_Mutex;
-    static thread_local std::deque<LostHostageDiscoverySelectedRadio> g_LHD_SelectedRadioQueue;
+    static std::unordered_map<std::uint32_t, LostHostageDiscoverySelectedRadio> g_LHD_PendingBySoldier;
+    static LostHostageDiscoverySelectedRadio g_LHD_NextConvertOverride{};
 }
 
 #ifdef _DEBUG
@@ -168,7 +168,8 @@ static void LostHostageDiscovery_ResetRuntimeState_NoLock()
 {
     g_LHD_LastCandidateTargetBySoldier.clear();
     g_LHD_LastConfirmedTargetBySoldier.clear();
-    g_LHD_SelectedRadioQueue.clear();
+    g_LHD_PendingBySoldier.clear();
+    g_LHD_NextConvertOverride = {};
 }
 
 static bool LostHostageDiscovery_TryReadTrackedTargetIds(
@@ -461,66 +462,89 @@ void LostHostageDiscovery_OnRadioRequest(void* self, int actionIndex, int stateP
     pending.radioType = after.byte10;
     pending.overrideLabel = hostageInfo.speechLabel;
 
-    if (!g_LHD_SelectedRadioQueue.empty())
-    {
-        const auto& back = g_LHD_SelectedRadioQueue.back();
-        if (back.soldierIndex == pending.soldierIndex &&
-            back.targetId == pending.targetId &&
-            back.radioType == pending.radioType &&
-            back.overrideLabel == pending.overrideLabel)
-        {
-            LHD_LOG(
-                "OnRadioRequest duplicate ignored: soldier=%u radioType=0x%02X target=0x%04X hostageType=%s label=0x%08X",
-                static_cast<unsigned>(pending.soldierIndex),
-                static_cast<unsigned>(pending.radioType),
-                static_cast<unsigned>(pending.targetId),
-                LostHostageDiscovery_HostageTypeName(pending.hostageType),
-                static_cast<unsigned>(pending.overrideLabel));
-            return;
-        }
-    }
-
-    g_LHD_SelectedRadioQueue.push_back(pending);
+    g_LHD_PendingBySoldier[pending.soldierIndex] = pending;
+    g_LHD_NextConvertOverride = pending;
 
     LHD_LOG(
-        "OnRadioRequest queued override: soldier=%u radioType=0x%02X target=0x%04X hostageType=%s label=0x%08X stateProc=%d queueSize=%u",
+        "OnRadioRequest stored override: soldier=%u radioType=0x%02X target=0x%04X hostageType=%s label=0x%08X stateProc=%d pendingCount=%u",
         static_cast<unsigned>(pending.soldierIndex),
         static_cast<unsigned>(pending.radioType),
         static_cast<unsigned>(pending.targetId),
         LostHostageDiscovery_HostageTypeName(pending.hostageType),
         static_cast<unsigned>(pending.overrideLabel),
         stateProc,
-        static_cast<unsigned>(g_LHD_SelectedRadioQueue.size()));
+        static_cast<unsigned>(g_LHD_PendingBySoldier.size()));
 }
-std::uint32_t LostHostageDiscovery_OnConvertRadioTypeToSpeechLabel(
+
+bool LostHostageDiscovery_TryConsumeConvertOverride(
     std::uint8_t radioType,
-    std::uint32_t baseLabel)
+    std::uint32_t& outOverrideLabel)
 {
+    outOverrideLabel = 0u;
+
     if (!LostHostageDiscovery_IsHostageDiscoveryRadioType(radioType))
-        return baseLabel;
+        return false;
 
-    if (g_LHD_SelectedRadioQueue.empty())
-        return baseLabel;
+    std::lock_guard<std::mutex> lock(g_LHD_Mutex);
 
-    // FIFO consume so back-to-back hostage discoveries from different soldiers
-    // do not overwrite each other before conversion happens.
-    const LostHostageDiscoverySelectedRadio selected = g_LHD_SelectedRadioQueue.front();
-    g_LHD_SelectedRadioQueue.pop_front();
+    if (!g_LHD_NextConvertOverride.active)
+        return false;
 
-    if (!selected.active || selected.overrideLabel == 0u)
-        return baseLabel;
+    if (g_LHD_NextConvertOverride.radioType != radioType)
+        return false;
+
+    if (g_LHD_NextConvertOverride.overrideLabel == 0u)
+    {
+        g_LHD_NextConvertOverride = {};
+        return false;
+    }
+
+    outOverrideLabel = g_LHD_NextConvertOverride.overrideLabel;
 
     LHD_LOG(
-        "OnConvert override: radioType=0x%02X baseLabel=0x%08X overrideLabel=0x%08X soldier=%u target=0x%04X hostageType=%s remainingQueue=%u",
+        "TryConsumeConvertOverride hit: radioType=0x%02X overrideLabel=0x%08X target=0x%04X hostageType=%s",
         static_cast<unsigned>(radioType),
-        static_cast<unsigned>(baseLabel),
+        static_cast<unsigned>(g_LHD_NextConvertOverride.overrideLabel),
+        static_cast<unsigned>(g_LHD_NextConvertOverride.targetId),
+        LostHostageDiscovery_HostageTypeName(g_LHD_NextConvertOverride.hostageType));
+
+    g_LHD_PendingBySoldier.erase(g_LHD_NextConvertOverride.soldierIndex);
+    g_LHD_NextConvertOverride = {};
+    return true;
+}
+bool LostHostageDiscovery_TryOverrideForCallWithRadioType(
+    std::uint32_t ownerIndex,
+    std::uint8_t radioType,
+    std::uint32_t& outOverrideLabel)
+{
+    outOverrideLabel = 0u;
+
+    if (!LostHostageDiscovery_IsHostageDiscoveryRadioType(radioType))
+        return false;
+
+    std::lock_guard<std::mutex> lock(g_LHD_Mutex);
+
+    const auto it = g_LHD_PendingBySoldier.find(ownerIndex);
+    if (it == g_LHD_PendingBySoldier.end())
+        return false;
+
+    const LostHostageDiscoverySelectedRadio selected = it->second;
+    g_LHD_PendingBySoldier.erase(it);
+
+    if (!selected.active || selected.overrideLabel == 0u)
+        return false;
+
+    LHD_LOG(
+        "TryOverride hit: speaker=%u radioType=0x%02X overrideLabel=0x%08X target=0x%04X hostageType=%s remainingPending=%u",
+        static_cast<unsigned>(ownerIndex),
+        static_cast<unsigned>(radioType),
         static_cast<unsigned>(selected.overrideLabel),
-        static_cast<unsigned>(selected.soldierIndex),
         static_cast<unsigned>(selected.targetId),
         LostHostageDiscovery_HostageTypeName(selected.hostageType),
-        static_cast<unsigned>(g_LHD_SelectedRadioQueue.size()));
+        static_cast<unsigned>(g_LHD_PendingBySoldier.size()));
 
-    return selected.overrideLabel;
+    outOverrideLabel = selected.overrideLabel;
+    return true;
 }
 
 void Add_LostHostageDiscovery(std::uint32_t gameObjectId, int hostageType)
@@ -572,11 +596,11 @@ void Remove_LostHostageDiscovery(std::uint32_t gameObjectId)
         std::lock_guard<std::mutex> lock(g_LHD_Mutex);
         g_LHD_TrackedHostagesByRawId.erase(rawGameObjectId);
 
-        for (auto it = g_LHD_SelectedRadioQueue.begin();
-            it != g_LHD_SelectedRadioQueue.end();)
+        for (auto it = g_LHD_PendingBySoldier.begin();
+            it != g_LHD_PendingBySoldier.end();)
         {
-            if (it->targetId == rawGameObjectId)
-                it = g_LHD_SelectedRadioQueue.erase(it);
+            if (it->second.targetId == rawGameObjectId)
+                it = g_LHD_PendingBySoldier.erase(it);
             else
                 ++it;
         }

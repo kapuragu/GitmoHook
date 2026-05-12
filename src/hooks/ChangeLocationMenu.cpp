@@ -24,13 +24,6 @@ using GetChangeLocationMenuParameterByLocationId_t = ChangeLocationMenuParameter
 using GetMbFreeChangeLocationMenuParameter_t = ChangeLocationMenuParameter* (__thiscall*) (MotherBaseMissionCommonData* This);
 
 // ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-static constexpr uintptr_t ABS_GetChangeLocationMenuParameterByLocationId = 0x145F785D0ull;
-static constexpr uintptr_t ABS_GetMbFreeChangeLocationMenuParameter = 0x145F78B90ull;
-
-// ----------------------------------------------------
 // Original pointers
 // ----------------------------------------------------
 

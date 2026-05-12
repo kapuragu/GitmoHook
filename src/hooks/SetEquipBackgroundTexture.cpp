@@ -23,13 +23,6 @@ using SetEquipBackgroundTexture_t = uint8_t(__fastcall*)(int equipId, void* isSo
 using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk);
 
 // ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-static constexpr uintptr_t ABS_SetEquipBackgroundTexture = 0x145F236F0ull;
-static constexpr uintptr_t ABS_SetTextureName = 0x141DC78F0ull;
-
-// ----------------------------------------------------
 // Originals / engine pointers
 // ----------------------------------------------------
 

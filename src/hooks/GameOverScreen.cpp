@@ -20,15 +20,6 @@ using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t texture
 using GameOverSetVisible_t = void(__fastcall*)(uint64_t* param_1, char param_2);
 
 // ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-//fox::ui::ModelNodeMesh::SetTextureName
-static constexpr uintptr_t ABS_SetTextureName = 0x141DC78F0ull;
-//tpp::ui::menu::GameOverEvCall::MainLayout::SetVisible
-static constexpr uintptr_t ABS_GameOverSetVisible = 0x145CB8890ull;
-
-// ----------------------------------------------------
 // Original pointers
 // ----------------------------------------------------
 

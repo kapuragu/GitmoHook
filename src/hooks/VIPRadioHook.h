@@ -2,38 +2,27 @@
 
 #include <cstdint>
 
-// Installs the VIP radio hooks.
-// Params: none
+
 bool Install_VIPRadio_Hook();
 
-// Removes the VIP radio hooks.
-// Params: none
+
 bool Uninstall_VIPRadio_Hook();
 
-// Adds one important target by gameObjectId.
-// Params: gameObjectId, isOfficer
-void Add_VIPRadioImportantGameObjectId(std::uint32_t gameObjectId, bool isOfficer);
 
-// Adds one important target by gameObjectId + soldierIndex.
-// Params: gameObjectId, soldierIndex, isOfficer
-void Add_VIPRadioImportantTarget(std::uint32_t gameObjectId, std::uint16_t soldierIndex, bool isOfficer);
+// customDeadBodyLabel: optional StrCode32 speech-label hash. If non-zero, the
+// VIP body-found radio for this target plays this label via g_CallImpl,
+// overriding both the officer-default and the VipBodyFound radioType swap. 0
+// keeps the built-in officer/VIP fallback behavior.
+void Add_VIPRadioImportantGameObjectId(std::uint32_t gameObjectId, bool isOfficer, std::uint32_t customDeadBodyLabel = 0);
 
-// Removes one important target by gameObjectId.
-// Params: gameObjectId
+
+void Add_VIPRadioImportantTarget(std::uint32_t gameObjectId, std::uint16_t soldierIndex, bool isOfficer, std::uint32_t customDeadBodyLabel = 0);
+
+
 void Remove_VIPRadioImportantGameObjectId(std::uint32_t gameObjectId);
 
-// Clears all important targets and runtime state.
-// Params: none
+
 void Clear_VIPRadioImportantGameObjectIds();
 
-// Queues a discovered important body using gameObjectId.
-// Params: foundGameObjectId
-bool Notify_VIPRadioBodyDiscovered(std::uint32_t foundGameObjectId);
 
-// Queues a discovered important body using gameObjectId + soldierIndex.
-// Params: foundGameObjectId, foundSoldierIndex
-bool Notify_VIPRadioBodyDiscoveredTarget(std::uint32_t foundGameObjectId, std::uint16_t foundSoldierIndex);
-
-// Returns true only when there is exactly one recent important corpse from RequestCorpse.
-// Params: outSoldierIndex, outIsOfficer
 bool Try_GetSingleRecentImportantCorpseIndex(std::uint16_t& outSoldierIndex, bool& outIsOfficer);

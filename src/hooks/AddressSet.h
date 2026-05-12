@@ -35,7 +35,8 @@ namespace AddressSetRuntime
         uintptr_t GameOverSetVisible = 0;
         uintptr_t GetCurrentMissionCode = 0;
         uintptr_t GetNameIdWithGameObjectId = 0;
-        uintptr_t LoadingScreenOrGameOverSplash2 = 0;
+        uintptr_t GetQuarkSystemTable = 0;
+        uintptr_t LoadingTipsEvUpdateInitPhase = 0;
         uintptr_t PathHashCode = 0;
         uintptr_t RequestCorpse = 0;
         uintptr_t SetEquipBackgroundTexture = 0;
@@ -47,7 +48,9 @@ namespace AddressSetRuntime
         uintptr_t State_EnterDownHoldup = 0;
         uintptr_t State_EnterStandHoldup1 = 0;
         uintptr_t State_EnterStandHoldupUnarmed = 0;
+        uintptr_t State_RecoveryKick = 0;
         uintptr_t State_RecoveryTouch = 0;
+        uintptr_t State_StandEnterRecoverySleepFaintHoldupComradeBySound = 0;
         uintptr_t State_StandHoldupCancelLookToPlayer = 0;
         uintptr_t State_StandRecoveryHoldup = 0;
         uintptr_t StepRadioDiscovery = 0;
@@ -105,6 +108,24 @@ namespace AddressSetRuntime
         //soundId
         uintptr_t Play_bgm_gameover_paradox_soundId = 0;
         uintptr_t Stop_bgm_gameover_paradox_soundId = 0;
+        
+        //tpp::ui::hud::TelopStartTitleEvCall::SetBgTexture texture path
+        uintptr_t TelopStartTitleEvCall_BgTexture = 0;
+
+        uintptr_t Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject = 0;
+        uintptr_t Fox_Sd_Object_Activate = 0;
+        uintptr_t Fox_Sd_Daemon_GetObject = 0;
+        uintptr_t Fox_Sd_Daemon_Singleton = 0;
+        // tpp::gm::impl::SoundControllerImpl::CallInternal
+        // Signature: void(this, voiceRequest*, uint soundSlot).
+        // soundSlot is the controller's per-controller slot index — not a goId.
+        uintptr_t SoundControllerImpl_CallInternal = 0;
+
+        // Soldier2SoundControllerImpl::Activate(this, uint slot, int soundIndex).
+        // Called per-soldier when their audio component spawns (mission load).
+        // Provides a (slot, controller) pair without needing the soldier to
+        // make audible noise.
+        uintptr_t Soldier2SoundController_Activate = 0;
     };
 
     inline GameBuild& GetGameBuild()
@@ -137,7 +158,8 @@ namespace AddressSetRuntime
             0x145CB8890ull, // GameOverSetVisible
             0x145E5EE70ull, // GetCurrentMissionCode
             0x146C98180ull, // GetNameIdWithGameObjectId
-            0x145CD0630ull, // LoadingScreenOrGameOverSplash2
+            0x140BFF3F0ull, // GetQuarkSystemTable
+            0x145CD0630ull, // LoadingTipsEvUpdateInitPhase
             0x14C1BD5D0ull, // PathHashCode
             0x140A69070ull, // RequestCorpse
             0x145F236F0ull, // SetEquipBackgroundTexture
@@ -149,7 +171,9 @@ namespace AddressSetRuntime
             0x14A140940ull, // State_EnterDownHoldup
             0x14A140C00ull, // State_EnterStandHoldup1
             0x14A141500ull, // State_EnterStandHoldupUnarmed
+            0x1414BC600ull, // State_RecoveryKick
             0x1414BCEF0ull, // State_RecoveryTouch
+            0x1414BC7B0ull, // State_StandEnterRecoverySleepFaintHoldupComradeBySound
             0x14A141910ull, // State_StandHoldupCancelLookToPlayer
             0x1414BCA10ull, // State_StandRecoveryHoldup
             0x14150F2C0ull, // StepRadioDiscovery
@@ -181,12 +205,12 @@ namespace AddressSetRuntime
             0x145F78B90ull, // GetMbFreeChangeLocationMenuParameter
             0x140925ef0ull, // GetPhotoAdditionalTextLangId
             
-            0x143f33a20ull,//FNVHash32
+            0x143f33a20ull, //FNVHash32
             
-            0x140e2470full,//DD_vox_SH_voice
-            0x140e24682ull,//DD_vox_SH_radio
-            0x140e246ffull,//DD_vox_SH_radio2
-            0x140e24707ull,//DD_vox_SH_radio3
+            0x140e2470full, //DD_vox_SH_voice
+            0x140e24682ull, //DD_vox_SH_radio
+            0x140e246ffull, //DD_vox_SH_radio2
+            0x140e24707ull, //DD_vox_SH_radio3
             
             0x14033d520ull, // AK_SoundEngine_SetRTPCValue (thunk → AK::SoundEngine::SetRTPCValue)
             0x14032adf0ull, // Fox_Sd_ConvertParameterID (thunk → fox::sd::ConvertParameterID; RTPC/Switch/State name hash)
@@ -206,6 +230,15 @@ namespace AddressSetRuntime
             //soundId
             0x14226bfc8ull,//Play_bgm_gameover_paradox_soundId
             0x14226bfccull,//Stop_bgm_gameover_paradox_soundId
+            
+            0x1408a898eull,//TelopStartTitleEvCall_BgTexture
+            
+            0x143F42540ull, // Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject
+            0x14032B040ull,         // Fox_Sd_Object_Activate 
+            0x140329C80ull,         // Fox_Sd_Daemon_GetObject 
+            0x142B9E8B0ull,         // Fox_Sd_Daemon_Singleton
+            0x1468EDD50ull,         // SoundControllerImpl_CallInternal 
+            0x14158B4f0ull,                         // Soldier2SoundController_Activate
         };
 
         return value;
@@ -229,7 +262,8 @@ namespace AddressSetRuntime
             0x1477cfcb0ull, // GameOverSetVisible
             0x147a691e0ull, // GetCurrentMissionCode
             0x148a58cb0ull, // GetNameIdWithGameObjectId
-            0x1477ed2f0ull, // LoadingScreenOrGameOverSplash2
+            0x148b24e40ull, // GetQuarkSystemTable
+            0x1477ed2f0ull, // LoadingTipsEvUpdateInitPhase
             0x14c96c160ull, // PathHashCode
             0x140a68b60ull, // RequestCorpse
             0x147a8c170ull, // SetEquipBackgroundTexture
@@ -241,7 +275,9 @@ namespace AddressSetRuntime
             0x14ab05b80ull, // State_EnterDownHoldup
             0x143f9160dull, // State_EnterStandHoldup1
             0x14ab06770ull, // State_EnterStandHoldupUnarmed
+            0x1414bc5d0ull, // State_RecoveryKick
             0x1414bcec0ull, // State_RecoveryTouch
+            0x1414bc780ull, // State_StandEnterRecoverySleepFaintHoldupComradeBySound
             0x14ab06c40ull, // State_StandHoldupCancelLookToPlayer
             0x1414bc9e0ull, // State_StandRecoveryHoldup
             0x14150f290ull, // StepRadioDiscovery
@@ -298,6 +334,15 @@ namespace AddressSetRuntime
             //soundId
             0x14226bf18ull,//Play_bgm_gameover_paradox_soundId
             0x145cb8f0dull,//Stop_bgm_gameover_paradox_soundId
+            
+            0x1408a84aeull,//TelopStartTitleEvCall_BgTexture
+            
+            0x143F7BCA0ull, // Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject (JP)
+            0x14032AAC0ull, // Fox_Sd_Object_Activate (JP)
+            0x140329710ull, // Fox_Sd_Daemon_GetObject (JP)
+            0x142B9E8B0ull, // Fox_Sd_Daemon_Singleton (JP)
+            0x1484D84E0ull, // SoundControllerImpl_CallInternal (JP)
+            0x14158B4F0ull, // Soldier2SoundController_Activate (FUN_14158b4f0; per-soldier audio component activation, fires at mission load)
         };
 
         return value;

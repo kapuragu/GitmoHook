@@ -5,7 +5,10 @@
 
 #include "BuiltInModules.h"
 #include "FeatureModule.h"
+#include "hooks/SoldierVoiceTypeQuery.h"
 #include "hooks/State_EnterStandHoldup1.h"
+#include "hooks/VIPSoundRecoveryHook.h"
+#include "hooks/VoicePitchOverride.h"
 
 // Installs the Lua registration hook.
 bool Install_SetLuaFunctions_Hook();
@@ -43,6 +46,9 @@ bool Uninstall_LostHostageDiscovery_Hooks();
 
 bool Install_UpdateOptCamo_Hook();
 bool Uninstall_UpdateOptCamo_Hook();
+
+bool Install_State_StandHoldupCancelLookToPlayer_Hook(HMODULE hGame);
+bool Uninstall_State_StandHoldupCancelLookToPlayer_Hook();
 
 namespace
 {
@@ -286,6 +292,85 @@ namespace
             Uninstall_LostHostageDiscovery_Hooks();
         }
     };
+
+    class VIPSoundRecoveryModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "VIPSoundRecovery";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            UNREFERENCED_PARAMETER(hGame);
+            return Install_VIPSoundRecovery_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_VIPSoundRecovery_Hook();
+        }
+    };
+
+    class HoldupCancelLookToPlayerModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "HoldupCancelLookToPlayer";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            return Install_State_StandHoldupCancelLookToPlayer_Hook(hGame);
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_State_StandHoldupCancelLookToPlayer_Hook();
+        }
+    };
+
+    class SoldierVoiceTypeQueryModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "SoldierVoiceTypeQuery";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            UNREFERENCED_PARAMETER(hGame);
+            return Install_SoldierVoiceTypeQuery_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_SoldierVoiceTypeQuery_Hook();
+        }
+    };
+
+    class VoicePitchOverrideModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "VoicePitchOverride";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            UNREFERENCED_PARAMETER(hGame);
+            return Install_VoicePitchOverride_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_VoicePitchOverride_Hook();
+        }
+    };
 }
 
 void RegisterBuiltInFeatureModules()
@@ -299,11 +384,15 @@ void RegisterBuiltInFeatureModules()
     static CautionTimerModule s_CautionTimerModule;
     static HoldUpReactionCowardlyReactionsModule s_HoldUpReactionCowardlyReactionsModule;
     
-    static LostHostageModule s_LostHostageModule;
+    /*static LostHostageModule s_LostHostageModule;*/
 
     static VIPSleepFaintModule s_VIPSleepFaintModule;
     static VIPHoldupModule s_VIPHoldupModule;
+    static VIPSoundRecoveryModule s_VIPSoundRecoveryModule;
     static VIPRadioModule s_VIPRadioModule;
+    static HoldupCancelLookToPlayerModule s_HoldupCancelLookToPlayerModule;
+    static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
+    static VoicePitchOverrideModule s_VoicePitchOverrideModule;
     
     static std::once_flag s_Once;
     std::call_once(s_Once, []()
@@ -317,8 +406,12 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_CautionTimerModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPSleepFaintModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPHoldupModule);
+            FeatureModuleRegistry::Instance().Register(&s_VIPSoundRecoveryModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPRadioModule);
             FeatureModuleRegistry::Instance().Register(&s_HoldUpReactionCowardlyReactionsModule);
-            FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
+            /*FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);*/
+            FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
+            FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
+            FeatureModuleRegistry::Instance().Register(&s_VoicePitchOverrideModule);
         });
 }

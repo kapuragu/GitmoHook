@@ -25,13 +25,6 @@ extern "C" {
 using GetPhotoAdditionalTextLangIdHook_t = unsigned long long(__thiscall*)(MotherBaseMissionCommonData* self, unsigned long long* __return_storage_ptr__, unsigned short missionCode, unsigned char photoId, unsigned char photoType);
 
 // ----------------------------------------------------
-// Addresses
-// ----------------------------------------------------
-
-//tpp::ui::menu::MotherBaseMissionCommonData::GetPhotoAdditionalTextLangId
-static constexpr uintptr_t ABS_GetPhotoAdditionalTextLangId = 0x140925ef0ull;
-
-// ----------------------------------------------------
 // Original pointers
 // ----------------------------------------------------
 

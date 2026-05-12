@@ -1,9 +1,11 @@
 #include "CautionStepNormalTimerHook.h"
+#include "FoxHashes.h"
 #include "GameOverMusic.h"
 #include "HeliVoice.h"
 #include "LostHostageHook.h"
 #include "pch.h"
-#include "SoldierRtpcHook.h"
+#include "SoldierObjectRtpc.h"
+#include "State_EnterStandHoldup1.h"
 #include "StepRadioDiscovery.h"
 #include "VIPHoldupHook.h"
 #include "VIPRadioHook.h"
@@ -396,6 +398,25 @@ static void PushLuaNumber(lua_State* L, float value)
     g_lua_pushnumber(L, static_cast<lua_Number>(value));
 }
 
+static std::uint32_t GetLuaStrCode32Arg(lua_State* L, int idx)
+{
+    if (GetLuaTop(L) < idx)
+        return 0u;
+
+    if (LuaIsString(L, idx))
+    {
+        const char* s = GetLuaString(L, idx);
+        if (!s || !s[0])
+            return 0u;
+        return FoxHashes::StrCode32(s);
+    }
+
+    if (LuaIsNumber(L, idx))
+        return static_cast<std::uint32_t>(GetLuaInt64(L, idx));
+
+    return 0u;
+}
+
 // Returns true if this Lua state was already registered.
 // Params: L
 static bool IsLuaStateRegistered(lua_State* L)
@@ -595,12 +616,15 @@ static void LuaPushValue(lua_State* L, int idx)
 // LUA FUNCTIONS
 //----------------
 
+void SetEnableTelopBg(bool is_enable);
+
 static int __cdecl l_SetEnableGzUi(lua_State* L)
 {
     const bool isEnable = GetLuaBool(L, 1) or false;
     SetEnableEquipBackgroundTexture(isEnable);
     SetEnableGameOverScreen(isEnable);
     SetEnableLoadingScreen(isEnable);
+    SetEnableTelopBg(isEnable);
     return 1;
 }
 
@@ -689,6 +713,14 @@ static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
     return success ? 1 : 0;
 }
 
+
+static int l_HoldUpReactionCowardlyReactions(lua_State* L)
+{
+    const bool enabled = GetLuaBool(L, 1);
+    Set_HoldUpReactionCowardlyReactions(enabled);
+    return 0;
+}
+
 // Sets the caution timer override.
 // Params: seconds
 static int l_SetCautionStepNormalDurationSeconds(lua_State* L)
@@ -723,20 +755,23 @@ static int l_GetCautionStepNormalRemainingSeconds(lua_State* L)
     return 1;
 }
 
-// Adds one lost hostage.
-// Params: gameObjectId, hostageType
+
 static int __cdecl l_SetLostHostage(lua_State* L)
 {
     const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
     const int hostageType = GetLuaInt(L, 2);
+    // Optional 3rd arg: voice line for the "prisoner gone" radio. Accepts
+    // either a label-name string (auto-hashed via FoxStrHash32) or a
+    // pre-hashed numeric StrCode32. 0 / omitted = built-in male/female/
+    // child × taken matrix.
+    const std::uint32_t customLostLabel = GetLuaStrCode32Arg(L, 3);
 
-    Add_LostHostageTrap(gameObjectId, hostageType);
+    Add_LostHostageTrap(gameObjectId, hostageType, customLostLabel);
     Add_LostHostageDiscovery(gameObjectId, hostageType);
     return 0;
 }
 
-// Removes one lost hostage.
-// Params: gameObjectId
+
 static int __cdecl l_RemoveLostHostage(lua_State* L)
 {
     const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
@@ -746,8 +781,7 @@ static int __cdecl l_RemoveLostHostage(lua_State* L)
     return 0;
 }
 
-// Clears all lost hostages.
-// Params: none
+
 static int __cdecl l_ClearLostHostages(lua_State* L)
 {
     UNREFERENCED_PARAMETER(L);
@@ -763,6 +797,7 @@ static int __cdecl l_SetLostHostageFromPlayer(lua_State* L)
     PlayerTookHostage(gameObjectId, playerTookHostage);
     return 0;
 }
+
 
 // Marks one VIP-important soldier.
 // Params: gameObjectId, isOfficer
@@ -801,15 +836,15 @@ static int __cdecl l_ClearVIPImportant(lua_State* L)
     return 0;
 }
 
-static int __cdecl l_SetSoldierRtpc(lua_State* L)
+// Per-soldier RTPC by name (DLL hashes via fox::sd::ConvertParameterID).
+static int __cdecl l_SetSoldierObjectRtpcByName(lua_State* L)
 {
-    const std::uint32_t goId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
-    const char* rtpcName = GetLuaString(L, 2);
-    const float value = GetLuaNumber(L, 3);
-    const long timeMs = static_cast<long>(GetLuaInt(L, 4));
-
-    const int result = SoldierRtpc::SetSoldierRtpc(goId, rtpcName, value, timeMs);
-    PushLuaNumber(L, static_cast<float>(result));
+    const std::uint32_t goId     = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
+    const char*         rtpcName = GetLuaString(L, 2);
+    const float         value    = GetLuaNumber(L, 3);
+    const long          timeMs   = static_cast<long>(GetLuaInt(L, 4));
+    const bool ok = ::Set_SoldierObjectRtpcByName(goId, rtpcName, value, timeMs);
+    PushLuaBool(L, ok);
     return 1;
 }
 
@@ -835,6 +870,7 @@ static luaL_Reg g_GitmoHook[] =
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
     { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },
+    { "HoldUpReactionCowardlyReaction",         l_HoldUpReactionCowardlyReactions },
         
     { "SetCautionStepNormalDurationSeconds",    l_SetCautionStepNormalDurationSeconds },
     { "GetCautionStepNormalDurationSeconds",    l_GetCautionStepNormalDurationSeconds },
@@ -851,7 +887,8 @@ static luaL_Reg g_GitmoHook[] =
     { "SetVIPImportant", l_SetVIPImportant },
     { "RemoveVIPImportant", l_RemoveVIPImportant },
     { "ClearVIPImportant", l_ClearVIPImportant },
-    { "SetSoldierRtpc", l_SetSoldierRtpc },
+    
+    { "SetSoldierRtpc",             l_SetSoldierObjectRtpcByName },
     { nullptr, nullptr }
 };
 

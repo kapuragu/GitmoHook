@@ -1,7 +1,7 @@
 ﻿#include "GameOverMusic.h"
 
 #include "AddressSet.h"
-#include "FNVHash32.h"
+#include "FoxHashes.h"
 #include "patch.h"
 
 static unsigned int Play_bgm_gameover_FNV132 = 2016311311;
@@ -18,8 +18,8 @@ static unsigned int Stop_bgm_s10010_gameover_FNV132 = 1018550225;
 
 bool SetGameOverMusic(bool isEnable, GAME_OVER_TYPE type, const char * playEventStr, const char * stopEventStr)
 {
-    unsigned int playEventHash = GetFNVHash32(playEventStr);
-    unsigned int stopEventHash = GetFNVHash32(stopEventStr);
+    unsigned int playEventHash = FoxHashes::FNVHash32(playEventStr);
+    unsigned int stopEventHash = FoxHashes::FNVHash32(stopEventStr);
     
     std::uint8_t* playEventBytes = static_cast<std::uint8_t*>(static_cast<void*>(&playEventHash));
     std::uint8_t* stopEventBytes = static_cast<std::uint8_t*>(static_cast<void*>(&stopEventHash));

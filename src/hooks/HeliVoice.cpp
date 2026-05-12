@@ -4,7 +4,7 @@
 #include "log.h"
 #include "HeliVoice.h"
 #include "AddressSet.h"
-#include "FNVHash32.h"
+#include "FoxHashes.h"
 #include "patch.h"
 
 extern "C" {
@@ -18,11 +18,12 @@ bool SetEnableHeliVoice(bool isEnable, const char *DD_vox_SH_voice_new, const ch
 {
     Log("[GitmoHook] SetEnableHeliVoice start\n");
     
-    unsigned int original_DD_vox_SH_voice_hash = GetFNVHash32(DD_vox_SH_voice);
-    unsigned int new_DD_vox_SH_voice_hash = GetFNVHash32(DD_vox_SH_voice_new);
+    uint32_t original_DD_vox_SH_voice_hash = FoxHashes::FNVHash32(DD_vox_SH_voice);
+    Log("[GitmoHook] SetEnableHeliVoice start 05\n");
+    uint32_t new_DD_vox_SH_voice_hash = FoxHashes::FNVHash32(DD_vox_SH_voice_new);
     
-    unsigned int original_DD_vox_SH_radio_hash = GetFNVHash32(DD_vox_SH_radio);
-    unsigned int new_DD_vox_SH_radio_hash = GetFNVHash32(DD_vox_SH_radio_new);
+    uint32_t original_DD_vox_SH_radio_hash = FoxHashes::FNVHash32(DD_vox_SH_radio);
+    uint32_t new_DD_vox_SH_radio_hash = FoxHashes::FNVHash32(DD_vox_SH_radio_new);
     
     std::uint8_t* original_DD_vox_SH_voice_Bytes = static_cast<std::uint8_t*>(static_cast<void*>(&original_DD_vox_SH_voice_hash));
     std::uint8_t* new_DD_vox_SH_voice_Bytes = static_cast<std::uint8_t*>(static_cast<void*>(&new_DD_vox_SH_voice_hash));
