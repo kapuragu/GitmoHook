@@ -35,7 +35,7 @@ namespace AddressSetRuntime
         uintptr_t GameOverSetVisible = 0;
         uintptr_t GetCurrentMissionCode = 0;
         uintptr_t GetNameIdWithGameObjectId = 0;
-        uintptr_t GetQuarkSystemTable = 0;
+        
         uintptr_t LoadingTipsEvUpdateInitPhase = 0;
         uintptr_t PathHashCode = 0;
         uintptr_t RequestCorpse = 0;
@@ -126,6 +126,7 @@ namespace AddressSetRuntime
         // Provides a (slot, controller) pair without needing the soldier to
         // make audible noise.
         uintptr_t Soldier2SoundController_Activate = 0;
+        uintptr_t GetQuarkSystemTable = 0;
     };
 
     inline GameBuild& GetGameBuild()
@@ -158,7 +159,7 @@ namespace AddressSetRuntime
             0x145CB8890ull, // GameOverSetVisible
             0x145E5EE70ull, // GetCurrentMissionCode
             0x146C98180ull, // GetNameIdWithGameObjectId
-            0x140BFF3F0ull, // GetQuarkSystemTable
+            
             0x145CD0630ull, // LoadingTipsEvUpdateInitPhase
             0x14C1BD5D0ull, // PathHashCode
             0x140A69070ull, // RequestCorpse
@@ -239,6 +240,7 @@ namespace AddressSetRuntime
             0x142B9E8B0ull,         // Fox_Sd_Daemon_Singleton
             0x1468EDD50ull,         // SoundControllerImpl_CallInternal 
             0x14158B4f0ull,                         // Soldier2SoundController_Activate
+            0x140BFF3F0ull, // GetQuarkSystemTable
         };
 
         return value;
@@ -262,7 +264,7 @@ namespace AddressSetRuntime
             0x1477cfcb0ull, // GameOverSetVisible
             0x147a691e0ull, // GetCurrentMissionCode
             0x148a58cb0ull, // GetNameIdWithGameObjectId
-            0x148b24e40ull, // GetQuarkSystemTable
+            
             0x1477ed2f0ull, // LoadingTipsEvUpdateInitPhase
             0x14c96c160ull, // PathHashCode
             0x140a68b60ull, // RequestCorpse
@@ -343,6 +345,7 @@ namespace AddressSetRuntime
             0x142B9E8B0ull, // Fox_Sd_Daemon_Singleton (JP)
             0x1484D84E0ull, // SoundControllerImpl_CallInternal (JP)
             0x14158B4F0ull, // Soldier2SoundController_Activate (FUN_14158b4f0; per-soldier audio component activation, fires at mission load)
+            0x148b24e40ull, // GetQuarkSystemTable
         };
 
         return value;

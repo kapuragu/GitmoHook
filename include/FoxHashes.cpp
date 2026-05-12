@@ -42,13 +42,6 @@ namespace FoxHashes
         
         if (!g_FNVHash32)
             g_FNVHash32 = reinterpret_cast<FNVHash32_t>(ResolveGameAddress(gAddr.FNVHash32));
-        
-        Log("[FoxHashes] ");
-        Log("FoxStrHash32 @%p", g_FoxStrHash32);
-        Log("FoxStrHash64 @%p", g_FoxStrHash64);
-        Log("PathHashCode @%p", g_PathHashCode);
-        Log("FNVHash32 @%p", g_FNVHash32);
-        Log("\n");
 
         return g_FoxStrHash32 && g_FoxStrHash64 && g_PathHashCode && g_FNVHash32;
     }
