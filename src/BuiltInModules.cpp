@@ -351,26 +351,6 @@ namespace
             Uninstall_SoldierVoiceTypeQuery_Hook();
         }
     };
-
-    class VoicePitchOverrideModule final : public IFeatureModule
-    {
-    public:
-        const char* GetName() const override
-        {
-            return "VoicePitchOverride";
-        }
-
-        bool Install(HMODULE hGame) override
-        {
-            UNREFERENCED_PARAMETER(hGame);
-            return Install_VoicePitchOverride_Hook();
-        }
-
-        void Uninstall() override
-        {
-            Uninstall_VoicePitchOverride_Hook();
-        }
-    };
 }
 
 void RegisterBuiltInFeatureModules()
@@ -392,7 +372,6 @@ void RegisterBuiltInFeatureModules()
     static VIPRadioModule s_VIPRadioModule;
     static HoldupCancelLookToPlayerModule s_HoldupCancelLookToPlayerModule;
     static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
-    static VoicePitchOverrideModule s_VoicePitchOverrideModule;
     
     static std::once_flag s_Once;
     std::call_once(s_Once, []()
@@ -412,6 +391,5 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
             FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
             FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
-            FeatureModuleRegistry::Instance().Register(&s_VoicePitchOverrideModule);
         });
 }

@@ -630,7 +630,7 @@ static int __cdecl l_SetEnableGzUi(lua_State* L)
 
 static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
 {
-    if ( !LuaType( L, -1)==LUA_TTABLE ) {
+    if ( !(LuaType( L, -1)==LUA_TTABLE) ) {
         Log("UpdateChangeLocationMenu expected table\n");
         return 0;
     }
@@ -649,7 +649,7 @@ static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
 
 static int __cdecl l_AddPhotoAdditionalText(lua_State* L)
 {
-    if ( !LuaType( L, -1)==LUA_TTABLE ) {
+    if ( !(LuaType( L, -1)==LUA_TTABLE) ) {
         Log("AddPhotoAdditionalText expected table\n");
         return 0;
     }

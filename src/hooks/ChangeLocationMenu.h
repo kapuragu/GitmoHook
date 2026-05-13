@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-typedef struct ChangeLocationMenuParameter {
+struct ChangeLocationMenuParameter {
     unsigned short LocationId;
     unsigned short MissionId;
     unsigned char paddingA[0x4];
@@ -10,7 +10,7 @@ typedef struct ChangeLocationMenuParameter {
     unsigned char paddingB[0x6];
 };
 
-typedef struct MotherBaseMissionCommonData {
+struct MotherBaseMissionCommonData {
     unsigned char paddingA[0x111];
     unsigned char ChangeLocationMenuParamCount;
     unsigned char paddingB[0x6];

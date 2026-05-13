@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-typedef enum PHOTO_TYPE : unsigned char {
+enum PHOTO_TYPE : unsigned char {
     photo_type_h = 0,
     photo_type_v = 1,
     photo_type_v2 = 2,//??? ASSUMPTION
 };
-typedef enum PHOTO_TEXT : unsigned char {
+enum PHOTO_TEXT : unsigned char {
     target_type_rescue = 1,
     target_type_recovery = 2,
     target_type_exclusion = 3,
@@ -14,7 +14,7 @@ typedef enum PHOTO_TEXT : unsigned char {
     target_type_tailing = 6,
 };
 
-typedef struct PhotoInfo {
+struct PhotoInfo {
     unsigned short MissionCode;
     unsigned char PhotoId;
     PHOTO_TYPE PhotoType;

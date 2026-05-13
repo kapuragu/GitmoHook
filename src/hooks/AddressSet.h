@@ -126,7 +126,7 @@ namespace AddressSetRuntime
         // Provides a (slot, controller) pair without needing the soldier to
         // make audible noise.
         uintptr_t Soldier2SoundController_Activate = 0;
-        uintptr_t GetQuarkSystemTable = 0;
+        uintptr_t GetQuarkSystemtable = 0;
     };
 
     inline GameBuild& GetGameBuild()

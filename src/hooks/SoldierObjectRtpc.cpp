@@ -233,9 +233,11 @@ bool Set_SoldierObjectRtpc(std::uint32_t gameObjectId,
                            long          timeMs)
 {
     void* object = WalkSoldierObject(gameObjectId);
+    Log("[SoldierObjectRtpc] object = %s\n", object ? "true" : "false");
     if (!object) return false;
 
     void* setRtpcFn = SafeReadVtableEntry(object, kVtbl_SetRTPC);
+    Log("[SoldierObjectRtpc] setRtpcFn = %s\n", setRtpcFn ? "true" : "false");
     if (!setRtpcFn) return false;
 
     return SafeCallSetRtpc(object,

@@ -33,4 +33,5 @@ bool TogglePatch(bool isEnable, uintptr_t pointer, SIZE_T dwSize, std::uint8_t* 
 
     Log("[Patch] TogglePatch(%s): wrote at %p\n",
         isEnable ? "true" : "false", target);
+    return true;
 }

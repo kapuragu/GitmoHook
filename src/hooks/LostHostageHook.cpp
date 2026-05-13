@@ -43,7 +43,7 @@ static constexpr int SOURCE_RADIO = 2;
 
 static constexpr std::uint32_t LABEL_MALE_NOT_TAKEN = 0xFA42F4E9u;
 static constexpr std::uint32_t LABEL_MALE_TAKEN = 0x43ED2D08u;
-static constexpr std::uint32_t LABEL_FEMALE_NOT_TAKEN = 0x91C5723Eu;
+static constexpr std::uint32_t LABEL_FEMALE_NOT_TAKEN = 0xbae03a98u;
 static constexpr std::uint32_t LABEL_FEMALE_TAKEN = 0xD586CA7Bu;
 static constexpr std::uint32_t LABEL_CHILD_NOT_TAKEN = 0x93B18EDAu;
 static constexpr std::uint32_t LABEL_CHILD_TAKEN = 0x96902568u;
@@ -166,8 +166,8 @@ static bool LoadGetQuarkSystemTable()
 {
     if (!g_GetQuarkSystemTable)
         g_GetQuarkSystemTable = reinterpret_cast<GetQuarkSystemTable_t>(
-            ResolveGameAddress(gAddr.GetQuarkSystemTable));
-    Log("GetQuarkSystemTable: @%p\n",gAddr.GetQuarkSystemTable);
+            ResolveGameAddress(gAddr.GetQuarkSystemtable));
+    Log("GetQuarkSystemTable: @%p\n",gAddr.GetQuarkSystemtable);
     return g_GetQuarkSystemTable != nullptr;
 }
 
