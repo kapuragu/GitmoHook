@@ -433,6 +433,13 @@ static void TrackLuaState(lua_State* L)
     g_RegisteredLuaStates.insert(L);
 }
 
+lua_State* GitmoHook_AnyLuaState()
+{
+    std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
+    if (g_RegisteredLuaStates.empty()) return nullptr;
+    return *g_RegisteredLuaStates.begin();
+}
+
 // Clears tracked Lua states.
 // Params: none
 static void ClearTrackedLuaStates()

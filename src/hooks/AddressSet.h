@@ -77,6 +77,7 @@ namespace AddressSetRuntime
         uintptr_t lua_next = 0;
         uintptr_t lua_gettable = 0;
         uintptr_t lua_pushvalue = 0;
+        uintptr_t lua_pcall = 0;
 
         uintptr_t GetChangeLocationMenuParameterByLocationId = 0;
         uintptr_t GetMbFreeChangeLocationMenuParameter = 0;
@@ -127,6 +128,8 @@ namespace AddressSetRuntime
         // make audible noise.
         uintptr_t Soldier2SoundController_Activate = 0;
         uintptr_t GetQuarkSystemtable = 0;
+
+        uintptr_t BasicActionImpl_StateCrawlSideRoll                    = 0;
     };
 
     inline GameBuild& GetGameBuild()
@@ -201,6 +204,7 @@ namespace AddressSetRuntime
             0x14C1DA770ull, // lua_next
             0x14C1D7C10ull, // lua_gettable
             0x14C1E87E0ull, // lua_pushvalue
+            0x141A11930ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
             
             0x145F785D0ull, // GetChangeLocationMenuParameterByLocationId
             0x145F78B90ull, // GetMbFreeChangeLocationMenuParameter
@@ -241,6 +245,8 @@ namespace AddressSetRuntime
             0x1468EDD50ull,         // SoundControllerImpl_CallInternal 
             0x14158B4f0ull,                         // Soldier2SoundController_Activate
             0x140BFF3F0ull, // GetQuarkSystemTable
+
+            0x1410A9520ull, // BasicActionImpl_StateCrawlSideRoll
         };
 
         return value;
@@ -306,6 +312,7 @@ namespace AddressSetRuntime
             0x14c98a010ull, // lua_next
             0x14c987b90ull, // lua_gettable
             0x14c98e1d0ull, // lua_pushvalue
+            0x141A11A50ull, // lua_pcall
             
             0x147b88d00ull, // GetChangeLocationMenuParameterByLocationId
             0x147b897d0ull, // GetMbFreeChangeLocationMenuParameter
@@ -346,6 +353,8 @@ namespace AddressSetRuntime
             0x1484D84E0ull, // SoundControllerImpl_CallInternal (JP)
             0x14158B4F0ull, // Soldier2SoundController_Activate (FUN_14158b4f0; per-soldier audio component activation, fires at mission load)
             0x148b24e40ull, // GetQuarkSystemTable
+
+            0x1410A6CA0ull, // BasicActionImpl_StateCrawlSideRoll
         };
 
         return value;

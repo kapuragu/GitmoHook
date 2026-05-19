@@ -5,6 +5,7 @@
 
 #include "BuiltInModules.h"
 #include "FeatureModule.h"
+#include "hooks/BasicActionImpl_StateCrawlSideRoll.h"
 #include "hooks/SoldierVoiceTypeQuery.h"
 #include "hooks/State_EnterStandHoldup1.h"
 #include "hooks/VIPSoundRecoveryHook.h"
@@ -351,6 +352,26 @@ namespace
             Uninstall_SoldierVoiceTypeQuery_Hook();
         }
     };
+
+    class CrawlSideRollModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "CrawlSideRoll";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            UNREFERENCED_PARAMETER(hGame);
+            return Install_BasicActionImpl_StateCrawlSideRoll_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_BasicActionImpl_StateCrawlSideRoll_Hook();
+        }
+    };
 }
 
 void RegisterBuiltInFeatureModules()
@@ -372,6 +393,7 @@ void RegisterBuiltInFeatureModules()
     static VIPRadioModule s_VIPRadioModule;
     static HoldupCancelLookToPlayerModule s_HoldupCancelLookToPlayerModule;
     static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
+    static CrawlSideRollModule s_CrawlSideRollModule;
     
     static std::once_flag s_Once;
     std::call_once(s_Once, []()
@@ -391,5 +413,6 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
             FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
             FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
+            FeatureModuleRegistry::Instance().Register(&s_CrawlSideRollModule);
         });
 }

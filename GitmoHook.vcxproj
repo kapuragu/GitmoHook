@@ -157,6 +157,7 @@
     <ClInclude Include="src\BuiltInModules.h" />
     <ClInclude Include="src\FeatureModule.h" />
     <ClInclude Include="src\hooks\AddressSet.h" />
+    <ClInclude Include="src\hooks\BasicActionImpl_StateCrawlSideRoll.h" />
     <ClInclude Include="src\hooks\CautionStepNormalTimerHook.h" />
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
     <ClInclude Include="src\hooks\GameOverMusic.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="src\hooks\HeliVoice.h" />
     <ClInclude Include="src\hooks\LoadingScreen.h" />
     <ClInclude Include="src\hooks\LostHostageHook.h" />
+    <ClInclude Include="src\hooks\LuaBroadcaster.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
     <ClInclude Include="src\hooks\SoldierAkObjIdMap.h" />
@@ -192,6 +194,7 @@
     </ClCompile>
     <ClCompile Include="src\BuiltInModules.cpp" />
     <ClCompile Include="src\FeatureModule.cpp" />
+    <ClCompile Include="src\hooks\BasicActionImpl_StateCrawlSideRoll.cpp" />
     <ClCompile Include="src\hooks\CautionStepNormalTimerHook.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
     <ClCompile Include="src\hooks\GameOverMusic.cpp" />
@@ -200,6 +203,7 @@
     <ClCompile Include="src\hooks\HeliVoice.cpp" />
     <ClCompile Include="src\hooks\LoadingScreen.cpp" />
     <ClCompile Include="src\hooks\LostHostageHook.cpp" />
+    <ClCompile Include="src\hooks\LuaBroadcaster.cpp" />
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\hooks\SetLuaFunctions.cpp" />
