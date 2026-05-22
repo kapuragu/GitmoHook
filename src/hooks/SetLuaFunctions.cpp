@@ -435,8 +435,11 @@ static void TrackLuaState(lua_State* L)
 
 lua_State* GitmoHook_AnyLuaState()
 {
+        Log("[GitmoHook] GitmoHook_AnyLuaState 0\n");
     std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
+        Log("[GitmoHook] GitmoHook_AnyLuaState 1\n");
     if (g_RegisteredLuaStates.empty()) return nullptr;
+        Log("[GitmoHook] GitmoHook_AnyLuaState 2\n");
     return *g_RegisteredLuaStates.begin();
 }
 
@@ -936,7 +939,17 @@ static void __fastcall hkSetLuaFunctions(lua_State* L)
 // Exported Lua loader for require("GitmoHook").
 extern "C" __declspec(dllexport) int __cdecl luaopen_GitmoHook(lua_State* L)
 {
-    return RegisterLuaLibrary(L, "GitmoHook", g_GitmoHook) ? 1 : 0;
+    if (!L)
+        return 0;
+
+    if (IsLuaStateRegistered(L))
+        return 0;
+
+    if (!RegisterLuaLibrary(L, "GitmoHook", g_GitmoHook))
+        return 0;
+
+    TrackLuaState(L);
+    return 1;
 }
 
 // Installs the SetLuaFunctions hook.

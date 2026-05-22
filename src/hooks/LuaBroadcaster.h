@@ -111,17 +111,22 @@ namespace GitmoHook
         First&& first,
         Rest&&... rest)
     {
+
+        Log("[V_FrameWork] EmitMessage category=%s 1\n",category);
         static_assert(1 + sizeof...(Rest) <= kMaxBroadcastArgs,
             "GitmoHook::EmitMessage supports a maximum of 8 optional arguments.");
 
+        Log("[V_FrameWork] EmitMessage category=%s 2\n",category);
         const LuaBroadcastArg values[] = {
             LuaBroadcastArg(std::forward<First>(first)),
             LuaBroadcastArg(std::forward<Rest>(rest))...
         };
+        Log("[V_FrameWork] EmitMessage category=%s 3\n",category);
 
         EmitMessageValues(category,
             msg,
             values,
             static_cast<int>(1 + sizeof...(Rest)));
+        Log("[V_FrameWork] EmitMessage category=%s 4\n",category);
     }
 }

@@ -134,11 +134,11 @@ namespace
 
     static bool PushBroadcastTarget(lua_State* L, const LuaApi& lua)
     {
-        lua.getfield(L, LUA_GLOBALSINDEX_51, const_cast<char*>("GitmoHook"));
+        lua.getfield(L, LUA_GLOBALSINDEX_51, const_cast<char*>("Mission"));
         if (lua.type(L, -1) != LUA_TTABLE)
             return false;
 
-        lua.getfield(L, -1, const_cast<char*>("BroadcastMessage"));
+        lua.getfield(L, -1, const_cast<char*>("SendMessage"));
         if (lua.type(L, -1) != LUA_TFUNCTION)
             return false;
 
@@ -217,7 +217,7 @@ namespace
     {
         const char* errMsg = lua.tolstring ? lua.tolstring(L, -1, nullptr) : nullptr;
 
-        Log("[V_FrameWork] BroadcastMessage pcall err=%d category=%s msg=%s: %s\n",
+        Log("[GitmoHook] Mission.SendMessage pcall err=%d category=%s msg=%s: %s\n",
             err,
             category,
             msg,
@@ -230,28 +230,40 @@ void GitmoHook::EmitMessageValues(const char* category,
     const LuaBroadcastArg* args,
     int argCount)
 {
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 1\n",category);
     if (!category || !msg)
         return;
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 2\n",category);
 
     lua_State* L = GitmoHook_AnyLuaState();
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 3\n",category);
     if (!L)
         return;
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 4\n",category);
 
     LuaApi lua{};
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 5\n",category);
     if (!ResolveLuaApi(lua))
         return;
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 6\n",category);
 
     const int savedTop = lua.gettop(L);
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 7\n",category);
 
     __try
     {
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 8\n",category);
         if (!PushBroadcastTarget(L, lua))
         {
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 9\n",category);
             lua.settop(L, savedTop);
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 10\n",category);
             return;
         }
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 11\n",category);
 
         PushRequiredBroadcastArgs(L, lua, category, msg);
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 12\n",category);
 
         const int pushedOptionalArgs = PushOptionalArgs(L, lua, args, argCount);
         const int luaArgCount = 2 + pushedOptionalArgs;
@@ -259,15 +271,17 @@ void GitmoHook::EmitMessageValues(const char* category,
         const int err = lua.pcall(L, luaArgCount, 0, 0);
         if (err != 0)
         {
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 13\n",category);
             LogBroadcastError(lua, L, err, category, msg);
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        Log("[V_FrameWork] BroadcastMessage SEH exception category=%s msg=%s\n",
+        Log("[GitmoHook] BroadcastMessage SEH exception category=%s msg=%s\n",
             category,
             msg);
     }
+        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 14\n",category);
 
     lua.settop(L, savedTop);
 }
