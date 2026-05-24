@@ -162,6 +162,7 @@
     <ClInclude Include="src\hooks\ChangeLocationMenu.h" />
     <ClInclude Include="src\hooks\GameOverMusic.h" />
     <ClInclude Include="src\hooks\GameOverScreen.h" />
+    <ClInclude Include="src\hooks\GetGameObjectIdWithIndex.h" />
     <ClInclude Include="src\hooks\GetPhotoAdditionalTextLangId.h" />
     <ClInclude Include="src\hooks\HeliVoice.h" />
     <ClInclude Include="src\hooks\LoadingScreen.h" />
@@ -194,11 +195,13 @@
     </ClCompile>
     <ClCompile Include="src\BuiltInModules.cpp" />
     <ClCompile Include="src\FeatureModule.cpp" />
+    <ClCompile Include="src\hooks\AddressSet.cpp" />
     <ClCompile Include="src\hooks\BasicActionImpl_StateCrawlSideRoll.cpp" />
     <ClCompile Include="src\hooks\CautionStepNormalTimerHook.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
     <ClCompile Include="src\hooks\GameOverMusic.cpp" />
     <ClCompile Include="src\hooks\GameOverScreen.cpp" />
+    <ClCompile Include="src\hooks\GetGameObjectIdWithIndex.cpp" />
     <ClCompile Include="src\hooks\GetPhotoAdditionalTextLangId.cpp" />
     <ClCompile Include="src\hooks\HeliVoice.cpp" />
     <ClCompile Include="src\hooks\LoadingScreen.cpp" />

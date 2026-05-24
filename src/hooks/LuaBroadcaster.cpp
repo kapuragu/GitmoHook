@@ -8,6 +8,7 @@ extern "C" {
 #include <cstring>
 
 #include "AddressSet.h"
+#include "FoxHashes.h"
 #include "HookUtils.h"
 #include "log.h"
 #include "LuaBroadcaster.h"
@@ -24,6 +25,8 @@ namespace
     using lua_getfield_t = void(__fastcall*)(lua_State*, int, char*);
     using lua_type_t = int(__fastcall*)(lua_State*, int);
     using lua_tolstring_t = const char* (__fastcall*)(lua_State*, int, size_t*);
+    using lua_pushvalue_t = void (__fastcall*)(lua_State*, int);
+    using lua_rawset_t    = void (__fastcall*)(lua_State*, int);
 
     static constexpr int LUA_GLOBALSINDEX_51 = -10002;
 
@@ -37,6 +40,8 @@ namespace
     static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x14C1D7320ull;
     static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x14C1ED760ull;
     static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A123C0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x14C1E87E0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset    = 0x14C1E9CF0ull;
 
     static uintptr_t GetLuaBridgeAddress(uintptr_t resolvedAddr,
         uintptr_t bootstrapAddr)
@@ -66,6 +71,8 @@ namespace
         lua_getfield_t    getfield = nullptr;
         lua_type_t        type = nullptr;
         lua_tolstring_t   tolstring = nullptr;
+        lua_pushvalue_t   pushvalue = nullptr;
+        lua_rawset_t      rawset = nullptr;
     };
 
     static bool ResolveLuaApi(LuaApi& lua)
@@ -110,6 +117,14 @@ namespace
             gAddr.lua_tolstring,
             BOOTSTRAP_EN_lua_tolstring);
 
+        lua.pushvalue = ResolveLua<lua_pushvalue_t>(
+            gAddr.lua_pushvalue,
+            BOOTSTRAP_EN_lua_pushvalue);
+
+        lua.rawset = ResolveLua<lua_rawset_t>(
+            gAddr.lua_rawset,
+            BOOTSTRAP_EN_lua_rawset);
+
         return lua.pcall &&
             lua.pushnumber &&
             lua.pushstring &&
@@ -118,7 +133,9 @@ namespace
             lua.settop &&
             lua.gettop &&
             lua.getfield &&
-            lua.type;
+            lua.type &&
+            lua.pushvalue &&
+            lua.rawset;
     }
 
     static int ClampBroadcastArgCount(int argCount)
@@ -132,17 +149,32 @@ namespace
         return argCount;
     }
 
-    static bool PushBroadcastTarget(lua_State* L, const LuaApi& lua)
+    static bool PushTppMainOnMessage(lua_State* L, const LuaApi& lua, int top0)
     {
-        lua.getfield(L, LUA_GLOBALSINDEX_51, const_cast<char*>("Mission"));
+        lua.getfield(L, LUA_GLOBALSINDEX_51, const_cast<char*>("TppMain"));
         if (lua.type(L, -1) != LUA_TTABLE)
+        {
+            lua.settop(L, top0);
             return false;
+        }
 
-        lua.getfield(L, -1, const_cast<char*>("SendMessage"));
+        lua.getfield(L, -1, const_cast<char*>("OnMessage"));
         if (lua.type(L, -1) != LUA_TFUNCTION)
+        {
+            lua.settop(L, top0);
             return false;
+        }
 
         return true;
+    }
+
+    static volatile std::uint32_t* GetMessageResendCounter()
+    {
+        if (!gAddr.MessageResendCounter)
+            return nullptr;
+
+        return reinterpret_cast<volatile std::uint32_t*>(
+            ResolveGameAddress(gAddr.MessageResendCounter));
     }
 
     static void PushRequiredBroadcastArgs(lua_State* L,
@@ -223,6 +255,7 @@ namespace
             msg,
             errMsg ? errMsg : "<no message>");
     }
+
 }
 
 void GitmoHook::EmitMessageValues(const char* category,
@@ -230,50 +263,52 @@ void GitmoHook::EmitMessageValues(const char* category,
     const LuaBroadcastArg* args,
     int argCount)
 {
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 1\n",category);
     if (!category || !msg)
         return;
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 2\n",category);
 
     lua_State* L = GitmoHook_AnyLuaState();
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 3\n",category);
     if (!L)
         return;
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 4\n",category);
 
     LuaApi lua{};
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 5\n",category);
     if (!ResolveLuaApi(lua))
         return;
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 6\n",category);
 
     const int savedTop = lua.gettop(L);
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 7\n",category);
 
     __try
     {
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 8\n",category);
-        if (!PushBroadcastTarget(L, lua))
+        volatile std::uint32_t* counter = GetMessageResendCounter();
+        const std::uint32_t saved = counter ? *counter : 0;
+        if (counter) *counter = 0xFFFFu;
+
+        if (PushTppMainOnMessage(L, lua, savedTop))
         {
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 9\n",category);
-            lua.settop(L, savedTop);
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 10\n",category);
-            return;
+            const std::uint32_t senderHash = FoxHashes::StrCode32(category);
+            const std::uint32_t msgHash    = FoxHashes::StrCode32(msg);
+
+            lua.pushnil(L);                                              // missionTable
+            lua.pushnumber(L, static_cast<lua_Number>(senderHash));      // sender hash
+            lua.pushnumber(L, static_cast<lua_Number>(msgHash));         // messageId hash
+
+            for (int i = 0; i < 4; ++i)
+            {
+                if (args && i < argCount)
+                    PushOneOptionalArg(L, lua, args[i]);
+                else
+                    lua.pushnil(L);
+            }
+
+            const int err = lua.pcall(L, 7, 0, 0);
+            if (err != 0)
+            {
+                const char* errMsg = lua.tolstring(L, -1, nullptr);
+                Log("[GitmoHook] TppMain.OnMessage pcall err=%d category=%s msg=%s: %s\n",
+                    err, category, msg, errMsg ? errMsg : "<no message>");
+            }
         }
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 11\n",category);
 
-        PushRequiredBroadcastArgs(L, lua, category, msg);
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 12\n",category);
-
-        const int pushedOptionalArgs = PushOptionalArgs(L, lua, args, argCount);
-        const int luaArgCount = 2 + pushedOptionalArgs;
-
-        const int err = lua.pcall(L, luaArgCount, 0, 0);
-        if (err != 0)
-        {
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 13\n",category);
-            LogBroadcastError(lua, L, err, category, msg);
-        }
+        if (counter) *counter = saved;
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -281,7 +316,6 @@ void GitmoHook::EmitMessageValues(const char* category,
             category,
             msg);
     }
-        Log("[GitmoHook] GitmoHook::EmitMessageValues category=%s 14\n",category);
 
     lua.settop(L, savedTop);
 }

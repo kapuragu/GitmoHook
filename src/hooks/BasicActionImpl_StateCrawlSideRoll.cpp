@@ -126,13 +126,13 @@ static void __fastcall hkStateCrawlSideRoll(
     std::uint32_t phase,
     void* param3)
 {
-    if (kVerboseEveryCallLog)
-    {
+    
+#ifdef _DEBUG
         Log("[CrawlSideRoll] LOGGING: playerIndex=%u phase=%u param3=%p\n",
             playerIndex,
             phase,
             param3);
-    }
+#endif
 
     if (g_OrigStateCrawlSideRoll)
         g_OrigStateCrawlSideRoll(this_, playerIndex, phase, param3);
@@ -143,31 +143,12 @@ static void __fastcall hkStateCrawlSideRoll(
     const ULONGLONG prevMs =
         g_LastCallTickMs.exchange(nowMs, std::memory_order_relaxed);
 
-    const std::uint64_t totalCalls =
-        g_TotalCalls.fetch_add(1, std::memory_order_relaxed) + 1ull;
-
-    if (totalCalls == 1)
-    {
-        Log("[CrawlSideRoll] hook firing first call: playerIndex=%u phase=%u param3=%p\n",
-            playerIndex,
-            phase,
-            param3);
-    }
+    g_TotalCalls.fetch_add(1, std::memory_order_relaxed);
 
     if (phase < 64u)
     {
         const std::uint64_t bit = 1ull << phase;
-
-        const std::uint64_t prev =
-            g_PhasesSeenMask.fetch_or(bit, std::memory_order_relaxed);
-
-        if ((prev & bit) == 0)
-        {
-            Log("[CrawlSideRoll] new phase observed: playerIndex=%u phase=%u param3=%p\n",
-                playerIndex,
-                phase,
-                param3);
-        }
+        g_PhasesSeenMask.fetch_or(bit, std::memory_order_relaxed);
     }
 
     if (MissionCodeGuard::ShouldBypassHooks())
@@ -247,19 +228,6 @@ static void __fastcall hkStateCrawlSideRoll(
     std::uint8_t direction = 0;
     TryReadRollDirection(this_, playerIndex, direction);
 
-    Log("[CrawlSideRoll] emit playerIndex=%u count=%llu rollPhase=%u direction=%u\n",
-        playerIndex,
-        static_cast<unsigned long long>(emitCount),
-        emitPhase,
-        static_cast<unsigned>(direction));
-
-
-
-    // Args:
-    //   playerIndex
-    //   emitCount
-    //   emitPhase: 1 = Start, 4 = Rolling, 2 = End StrCode32
-    //   direction
     GitmoHook::EmitMessage(
         "Player",
         "CrawlRolling",

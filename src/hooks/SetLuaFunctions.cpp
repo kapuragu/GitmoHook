@@ -435,11 +435,8 @@ static void TrackLuaState(lua_State* L)
 
 lua_State* GitmoHook_AnyLuaState()
 {
-        Log("[GitmoHook] GitmoHook_AnyLuaState 0\n");
     std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
-        Log("[GitmoHook] GitmoHook_AnyLuaState 1\n");
     if (g_RegisteredLuaStates.empty()) return nullptr;
-        Log("[GitmoHook] GitmoHook_AnyLuaState 2\n");
     return *g_RegisteredLuaStates.begin();
 }
 
@@ -808,17 +805,15 @@ static int __cdecl l_SetLostHostageFromPlayer(lua_State* L)
     return 0;
 }
 
-
-// Marks one VIP-important soldier.
-// Params: gameObjectId, isOfficer
 static int __cdecl l_SetVIPImportant(lua_State* L)
 {
     const std::uint32_t gameObjectId = static_cast<std::uint32_t>(GetLuaInt64(L, 1));
     const bool isOfficer = GetLuaBool(L, 2);
+    const std::uint32_t customDeadBodyLabel = GetLuaStrCode32Arg(L, 3);
 
     Add_VIPSleepFaintImportantGameObjectId(gameObjectId, isOfficer);
     Add_VIPHoldupImportantGameObjectId(gameObjectId, isOfficer);
-    Add_VIPRadioImportantGameObjectId(gameObjectId, isOfficer);
+    Add_VIPRadioImportantGameObjectId(gameObjectId, isOfficer, customDeadBodyLabel);
     return 0;
 }
 

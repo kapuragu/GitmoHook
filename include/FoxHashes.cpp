@@ -7,6 +7,7 @@
 #include <string>
 
 #include "HookUtils.h"
+#include "log.h"
 #include "hooks/AddressSet.h"
 
 namespace
