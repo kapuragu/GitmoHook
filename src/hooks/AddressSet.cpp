@@ -156,7 +156,7 @@ namespace AddressSetRuntime
             0x1410A9520ull, // BasicActionImpl_StateCrawlSideRoll
             0x146C96520ull, // GetGameObjectIdWithIndex
             
-            0ull, // MessageResendCounter
+            0x142c1fd24ull, // MessageResendCounter
         };
 
         return value;
@@ -267,7 +267,7 @@ namespace AddressSetRuntime
             0x1410A6CA0ull, // BasicActionImpl_StateCrawlSideRoll
             0x148A57620ull, // GetGameObjectIdWithIndex
             
-            0ull, // MessageResendCounter
+            0x142c1fd24ull, // MessageResendCounter
         };
 
         return value;
