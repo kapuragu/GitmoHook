@@ -8,8 +8,10 @@ namespace AddressSetRuntime
     enum class GameBuild
     {
         Unknown,
-        English,
-        Japanese
+        Tpp_steam_mst_en_day1820,
+        Tpp_steam_mst_jp_day1820,
+        Tpp_steam_mst_en_day3800,
+        Tpp_steam_mst_jp_day3800
     };
 
     struct AddressSet
@@ -140,8 +142,10 @@ namespace AddressSetRuntime
         return value;
     }
 
-    const AddressSet& GetEnglishAddressSet();
-    const AddressSet& GetJapaneseAddressSet();
+    const AddressSet& Get_mst_en_day1820_AddressSet();
+    const AddressSet& Get_mst_jp_day1820_AddressSet();
+    const AddressSet& Get_mst_en_day3800_AddressSet();
+    const AddressSet& Get_mst_jp_day3800_AddressSet();
     GameBuild DetectGameBuildFromVersionInfo(HMODULE hGame);
     bool ResolveAddressSet(HMODULE hGame);
 
@@ -149,10 +153,14 @@ namespace AddressSetRuntime
     {
         switch (build)
         {
-        case GameBuild::English:
-            return "English";
-        case GameBuild::Japanese:
-            return "Japanese";
+        case GameBuild::Tpp_steam_mst_en_day1820:
+            return "Tpp_steam_mst_en_day1820";
+        case GameBuild::Tpp_steam_mst_jp_day1820:
+            return "Tpp_steam_mst_jp_day1820";
+        case GameBuild::Tpp_steam_mst_en_day3800:
+            return "Tpp_steam_mst_en_day3800";
+        case GameBuild::Tpp_steam_mst_jp_day3800:
+            return "Tpp_steam_mst_jp_day3800";
         default:
             return "Unknown";
         }

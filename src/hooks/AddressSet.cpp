@@ -51,7 +51,7 @@ namespace AddressSetRuntime
         }
     }
 
-    const AddressSet& GetEnglishAddressSet()
+    const AddressSet& Get_mst_en_day1820_AddressSet()//1.0.15.3 english
     {
         static const AddressSet value =
         {
@@ -162,7 +162,7 @@ namespace AddressSetRuntime
         return value;
     }
 
-    const AddressSet& GetJapaneseAddressSet()
+    const AddressSet& Get_mst_jp_day1820_AddressSet()//1.0.15.3 japanese
     {
         static const AddressSet value =
         {
@@ -222,7 +222,7 @@ namespace AddressSetRuntime
             0x14c98a010ull, // lua_next
             0x14c987b90ull, // lua_gettable
             0x14c98e1d0ull, // lua_pushvalue
-            0x141A11A50ull, // lua_pcall
+            0x141A11A50ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
             
             0x147b88d00ull, // GetChangeLocationMenuParameterByLocationId
             0x147b897d0ull, // GetMbFreeChangeLocationMenuParameter
@@ -272,6 +272,226 @@ namespace AddressSetRuntime
 
         return value;
     }
+    
+    const AddressSet& Get_mst_en_day3800_AddressSet()//1.0.15.4 english
+    {
+        static const AddressSet value =
+        {
+            0x14147df70ull,//tpp::gm::soldier::impl::HoldupActionImpl::AddNoise not thunk!
+            0x1414dba80ull,//tpp::gm::soldier::impl::`anonymous_namespace'::NoticeControllerImpl::AddNoticeInfo
+            0x140da2980ull,//tpp::gm::impl::cp::`anonymous_namespace'::RadioSpeechHandlerImpl::CallImpl
+            0x140da2f70ull,//tpp::gm::impl::cp::`anonymous_namespace'::RadioSpeechHandlerImpl::CallWithRadioType
+            0x1414dffb0ull,//tpp::gm::soldier::impl::`anonymous_namespace'::NoticeControllerImpl::CheckSightNoticeHostage
+            0x140d68480ull,//tpp::gm::CpRadioService::ConvertRadioTypeToSpeechLabel
+            0x140d6e960ull,//tpp::gm::impl::cp::CautionAiImpl::DecrementPhaseCounter
+            0x140a19730ull,//tpp::gm::TrapExecLostHostageCallback::ExecCallback
+            0x14006b8c0ull,//fox::LuaRegisterLibrary
+            0x141a098b0ull,//fox::FoxStrHash32
+            0x1400234c0ull,//fox::FoxStrHash32 64? both look the same and have the same xrefs??? does it even matter
+            0x140887840ull,//tpp::ui::menu::GameOverEvCall::MainLayout::SetVisible
+            0x140911210ull,//tpp::ui::utility::GetCurrentMissionId
+            0x140bf43e0ull,//fox::gm::GetNameIdWithGameObjectId
+            
+            0x14089aaa0ull,//tpp::ui::menu::LoadingTipsEv::UpdateInitPhase
+            0x141a098e0ull,//path_hash_code
+            0x140a69760ull,//tpp::gm::corpse::impl::CorpseManagerImpl::RequestCorpse
+            0x140918030ull,//tpp::ui::utility::SetWeaponPanelLogo
+            0x1408d81f0ull,//tpp::ui::UiCommand::SetLuaFunctions
+            0x141dc7ce0ull,//fox::ui::ModelNodeMesh::SetTextureName
+            0x140d69000ull,//tpp::gm::impl::cp::ActionControllerImpl::StateRadio
+            0x14154fd00ull,//tpp::gm::soldier::impl::RadioActionImpl::State_RadioRequest
+            0x0ull, // State_ComradeAction
+            0x0ull, // State_EnterDownHoldup
+            0x0ull, // State_EnterStandHoldup1
+            0x0ull, // State_EnterStandHoldupUnarmed
+            0x0ull, // State_RecoveryKick
+            0x0ull, // State_RecoveryTouch
+            0x0ull, // State_StandEnterRecoverySleepFaintHoldupComradeBySound
+            0x0ull, // State_StandHoldupCancelLookToPlayer
+            0x0ull, // State_StandRecoveryHoldup
+            0x0ull, // StepRadioDiscovery
+            
+            0x0ull, // lua_getfield
+            0x0ull, // lua_gettop
+            0x0ull, // lua_isnumber
+            0x0ull, // lua_isstring
+            0x0ull, // lua_objlen
+            0x0ull, // lua_pushboolean
+            0x0ull, // lua_pushnumber
+            0x0ull, // lua_rawgeti
+            0x0ull, // lua_settop
+            0x0ull, // lua_toboolean
+            0x0ull, // lua_tointeger
+            0x0ull, // lua_tolstring
+            0x0ull, // lua_tonumber
+            0x0ull, // lua_type
+            0x0ull, // lua_pushstring
+            0x0ull, // lua_createtable
+            0x0ull, // lua_rawset
+            0x0ull, // lua_settable
+            0x0ull, // lua_pushnil
+            0x0ull, // lua_next
+            0x0ull, // lua_gettable
+            0x0ull, // lua_pushvalue
+            0x0ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
+            0x0ull, // GetChangeLocationMenuParameterByLocationId
+            0x0ull, // GetMbFreeChangeLocationMenuParameter
+            0x0ull, // GetPhotoAdditionalTextLangId
+            
+            0x0ull, //FNVHash32
+            
+            0x0ull, //DD_vox_SH_voice
+            0x0ull, //DD_vox_SH_radio
+            0x0ull, //DD_vox_SH_radio2
+            0x0ull, //DD_vox_SH_radio3
+            
+            0x0ull, // AK_SoundEngine_SetRTPCValue (thunk → AK::SoundEngine::SetRTPCValue)
+            0x0ull, // Fox_Sd_ConvertParameterID (thunk → fox::sd::ConvertParameterID; RTPC/Switch/State name hash)
+
+            //tpp::ui::menu::GameOverEvCall::PlayBgm
+            0x0ull,//Play_bgm_gameover
+            0x0ull,//Play_bgm_gameover_paradox
+            0x0ull,//Play_bgm_gameover_perfectstealth
+            0x0ull,//Play_bgm_s10010_gameover
+
+            //tpp::ui::menu::GameOverEvCall::StopBgm
+            0x0ull,//Stop_bgm_gameover 
+            0x0ull,//Stop_bgm_gameover_paradox
+            0x0ull,//Stop_bgm_gameover_perfectstealth
+            0x0ull,//Stop_bgm_s10010_gameover
+        
+            //soundId
+            0x0ull,//Play_bgm_gameover_paradox_soundId
+            0x0ull,//Stop_bgm_gameover_paradox_soundId
+            
+            0x0ull,//TelopStartTitleEvCall_BgTexture
+            
+            0x0ull, // Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject
+            0x0ull,         // Fox_Sd_Object_Activate 
+            0x0ull,         // Fox_Sd_Daemon_GetObject 
+            0x0ull,         // Fox_Sd_Daemon_Singleton
+            0x0ull,         // SoundControllerImpl_CallInternal 
+            0x0ull,                         // Soldier2SoundController_Activate
+            0x0ull, // GetQuarkSystemTable
+
+            0x0ull, // BasicActionImpl_StateCrawlSideRoll
+            0x0ull, // GetGameObjectIdWithIndex
+            
+            0x0ull, // MessageResendCounter
+        };
+
+        return value;
+    };
+    
+    const AddressSet& Get_mst_jp_day3800_AddressSet()//1.0.15.4 japanese
+    {
+        static const AddressSet value =
+        {
+            0x0ull,//tpp::gm::soldier::impl::HoldupActionImpl::AddNoise not thunk!
+            0x0ull,//tpp::gm::soldier::impl::`anonymous_namespace'::NoticeControllerImpl::AddNoticeInfo
+            0x0ull,//tpp::gm::impl::cp::`anonymous_namespace'::RadioSpeechHandlerImpl::CallImpl
+            0x0ull,//tpp::gm::impl::cp::`anonymous_namespace'::RadioSpeechHandlerImpl::CallWithRadioType
+            0x0ull,//tpp::gm::soldier::impl::`anonymous_namespace'::NoticeControllerImpl::CheckSightNoticeHostage
+            0x0ull,//tpp::gm::CpRadioService::ConvertRadioTypeToSpeechLabel
+            0x0ull,//tpp::gm::impl::cp::CautionAiImpl::DecrementPhaseCounter
+            0x0ull,//tpp::gm::TrapExecLostHostageCallback::ExecCallback
+            0x0ull,//fox::LuaRegisterLibrary
+            0x0ull,//fox::FoxStrHash32
+            0x0ull,//fox::FoxStrHash32 64? both look the same and have the same xrefs??? does it even matter
+            0x0ull,//tpp::ui::menu::GameOverEvCall::MainLayout::SetVisible
+            0x0ull,//tpp::ui::utility::GetCurrentMissionId
+            0x0ull,//fox::gm::GetNameIdWithGameObjectId
+            
+            0x0ull, // LoadingTipsEvUpdateInitPhase
+            0x0ull, // PathHashCode
+            0x0ull, // RequestCorpse
+            0x0ull, // SetEquipBackgroundTexture
+            0x0ull, // SetLuaFunctions
+            0x0ull, // SetTextureName
+            0x0ull, // StateRadio
+            0x0ull, // StateRadioRequest
+            0x0ull, // State_ComradeAction
+            0x0ull, // State_EnterDownHoldup
+            0x0ull, // State_EnterStandHoldup1
+            0x0ull, // State_EnterStandHoldupUnarmed
+            0x0ull, // State_RecoveryKick
+            0x0ull, // State_RecoveryTouch
+            0x0ull, // State_StandEnterRecoverySleepFaintHoldupComradeBySound
+            0x0ull, // State_StandHoldupCancelLookToPlayer
+            0x0ull, // State_StandRecoveryHoldup
+            0x0ull, // StepRadioDiscovery
+            
+            0x0ull, // lua_getfield
+            0x0ull, // lua_gettop
+            0x0ull, // lua_isnumber
+            0x0ull, // lua_isstring
+            0x0ull, // lua_objlen
+            0x0ull, // lua_pushboolean
+            0x0ull, // lua_pushnumber
+            0x0ull, // lua_rawgeti
+            0x0ull, // lua_settop
+            0x0ull, // lua_toboolean
+            0x0ull, // lua_tointeger
+            0x0ull, // lua_tolstring
+            0x0ull, // lua_tonumber
+            0x0ull, // lua_type
+            0x0ull, // lua_pushstring
+            0x0ull, // lua_createtable
+            0x0ull, // lua_rawset
+            0x0ull, // lua_settable
+            0x0ull, // lua_pushnil
+            0x0ull, // lua_next
+            0x0ull, // lua_gettable
+            0x0ull, // lua_pushvalue
+            0x0ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
+            0x0ull, // GetChangeLocationMenuParameterByLocationId
+            0x0ull, // GetMbFreeChangeLocationMenuParameter
+            0x0ull, // GetPhotoAdditionalTextLangId
+            
+            0x0ull, //FNVHash32
+            
+            0x0ull, //DD_vox_SH_voice
+            0x0ull, //DD_vox_SH_radio
+            0x0ull, //DD_vox_SH_radio2
+            0x0ull, //DD_vox_SH_radio3
+            
+            0x0ull, // AK_SoundEngine_SetRTPCValue (thunk → AK::SoundEngine::SetRTPCValue)
+            0x0ull, // Fox_Sd_ConvertParameterID (thunk → fox::sd::ConvertParameterID; RTPC/Switch/State name hash)
+
+            //tpp::ui::menu::GameOverEvCall::PlayBgm
+            0x0ull,//Play_bgm_gameover
+            0x0ull,//Play_bgm_gameover_paradox
+            0x0ull,//Play_bgm_gameover_perfectstealth
+            0x0ull,//Play_bgm_s10010_gameover
+
+            //tpp::ui::menu::GameOverEvCall::StopBgm
+            0x0ull,//Stop_bgm_gameover 
+            0x0ull,//Stop_bgm_gameover_paradox
+            0x0ull,//Stop_bgm_gameover_perfectstealth
+            0x0ull,//Stop_bgm_s10010_gameover
+        
+            //soundId
+            0x0ull,//Play_bgm_gameover_paradox_soundId
+            0x0ull,//Stop_bgm_gameover_paradox_soundId
+            
+            0x0ull,//TelopStartTitleEvCall_BgTexture
+            
+            0x0ull, // Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject
+            0x0ull,         // Fox_Sd_Object_Activate 
+            0x0ull,         // Fox_Sd_Daemon_GetObject 
+            0x0ull,         // Fox_Sd_Daemon_Singleton
+            0x0ull,         // SoundControllerImpl_CallInternal 
+            0x0ull,                         // Soldier2SoundController_Activate
+            0x0ull, // GetQuarkSystemTable
+
+            0x0ull, // BasicActionImpl_StateCrawlSideRoll
+            0x0ull, // GetGameObjectIdWithIndex
+            
+            0x0ull, // MessageResendCounter
+        };
+
+        return value;
+    };
 
     GameBuild DetectGameBuildFromVersionInfo(HMODULE hGame)
     {
@@ -283,20 +503,26 @@ namespace AddressSetRuntime
         std::string text = ReadWholeFileUtf8OrAnsi(versionInfoPath);
         if (text.empty())
         {
-            Log("[AddressSet] Failed to read version_info.txt, defaulting to English.\n");
-            return GameBuild::English;
+            Log("[AddressSet] Failed to read version_info.txt, defaulting to English 1.0.15.4.\n");
+            return GameBuild::Tpp_steam_mst_en_day3800;
         }
 
         text = ToLowerAscii(text);
         Log("[AddressSet] version_info.txt = %s\n", text.c_str());
 
-        if (text.find("mst_en") != std::string::npos)
-            return GameBuild::English;
+        if (text.find("Tpp_steam_mst_en_day1820") != std::string::npos)
+            return GameBuild::Tpp_steam_mst_en_day1820;
 
-        if (text.find("mst_jp") != std::string::npos)
-            return GameBuild::Japanese;
+        if (text.find("Tpp_steam_mst_jp_day1820") != std::string::npos)
+            return GameBuild::Tpp_steam_mst_jp_day1820;
 
-        return GameBuild::English;
+        if (text.find("Tpp_steam_mst_en_day3800") != std::string::npos)
+            return GameBuild::Tpp_steam_mst_en_day3800;
+
+        if (text.find("Tpp_steam_mst_jp_day3800") != std::string::npos)
+            return GameBuild::Tpp_steam_mst_jp_day3800;
+
+        return GameBuild::Tpp_steam_mst_en_day3800;
     }
 
     bool ResolveAddressSet(HMODULE hGame)
@@ -308,18 +534,18 @@ namespace AddressSetRuntime
 
         switch (GetGameBuild())
         {
-        case GameBuild::English:
-            GetAddressSet() = GetEnglishAddressSet();
+        case GameBuild::Tpp_steam_mst_en_day1820:
+            GetAddressSet() = Get_mst_en_day1820_AddressSet();
             Log("[AddressSet] Selected English address set.\n");
             return true;
 
-        case GameBuild::Japanese:
-            GetAddressSet() = GetJapaneseAddressSet();
+        case GameBuild::Tpp_steam_mst_jp_day1820:
+            GetAddressSet() = Get_mst_jp_day1820_AddressSet();
             Log("[AddressSet] Selected Japanese address set.\n");
             return true;
 
         default:
-            GetAddressSet() = GetEnglishAddressSet();
+            GetAddressSet() = Get_mst_en_day1820_AddressSet();
             Log("[AddressSet] Unknown build, defaulting to English address set.\n");
             return true;
         }
