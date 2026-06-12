@@ -507,22 +507,15 @@ namespace AddressSetRuntime
             return GameBuild::Tpp_steam_mst_en_day3800;
         }
 
-        //text = ToLowerAscii(text);
+        text = ToLowerAscii(text);
         Log("[AddressSet] version_info.txt = %s\n", text.c_str());
-
-        if (text.find("Tpp_steam_mst_en_day1820") != std::string::npos)
-            return GameBuild::Tpp_steam_mst_en_day1820;
-
-        if (text.find("Tpp_steam_mst_jp_day1820") != std::string::npos)
-            return GameBuild::Tpp_steam_mst_jp_day1820;
-
-        if (text.find("Tpp_steam_mst_en_day3800") != std::string::npos)
-            return GameBuild::Tpp_steam_mst_en_day3800;
-
-        if (text.find("Tpp_steam_mst_jp_day3800") != std::string::npos)
-            return GameBuild::Tpp_steam_mst_jp_day3800;
-
-        return GameBuild::Tpp_steam_mst_en_day3800;
+        
+        const bool jp   = text.find("mst_jp") != std::string::npos;
+        const bool prev = text.find("day1820") != std::string::npos;   // 1.0.15.3
+        
+        if (prev)
+            return jp ? GameBuild::Tpp_steam_mst_jp_day1820 : GameBuild::Tpp_steam_mst_en_day1820;
+        return jp ? GameBuild::Tpp_steam_mst_jp_day3800 : GameBuild::Tpp_steam_mst_en_day3800;    // day3800 / default = current
     }
 
     bool ResolveAddressSet(HMODULE hGame)
