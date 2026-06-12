@@ -196,6 +196,10 @@
     <ClCompile Include="src\BuiltInModules.cpp" />
     <ClCompile Include="src\FeatureModule.cpp" />
     <ClCompile Include="src\hooks\AddressSet.cpp" />
+    <ClCompile Include="src\hooks\AddressSet_en_day1820.cpp" />
+    <ClCompile Include="src\hooks\AddressSet_en_day3800.cpp" />
+    <ClCompile Include="src\hooks\AddressSet_jp_day1820.cpp" />
+    <ClCompile Include="src\hooks\AddressSet_jp_day3800.cpp" />
     <ClCompile Include="src\hooks\BasicActionImpl_StateCrawlSideRoll.cpp" />
     <ClCompile Include="src\hooks\CautionStepNormalTimerHook.cpp" />
     <ClCompile Include="src\hooks\ChangeLocationMenu.cpp" />
