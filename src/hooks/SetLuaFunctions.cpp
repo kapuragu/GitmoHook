@@ -64,7 +64,7 @@ namespace
 
     // English bootstrap addresses for the Lua bridge.
     // These are used before version_info.txt is resolved so the bridge can hook as early as the original build.
-    static constexpr uintptr_t BOOTSTRAP_EN_SetLuaFunctions = 0x1408D78A0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_SetLuaFunctions = 0x1408d81f0ull;
     static constexpr uintptr_t BOOTSTRAP_EN_FoxLuaRegisterLibrary = 0x14006b8c0ull;
     static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A12150ull;
     static constexpr uintptr_t BOOTSTRAP_EN_lua_tointeger = 0x141A12120ull;
