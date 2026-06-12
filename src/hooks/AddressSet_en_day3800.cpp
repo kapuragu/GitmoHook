@@ -65,6 +65,8 @@ namespace AddressSetRuntime
             0x141A112B0ull, // lua_gettable
             0x141A119D0ull, // lua_pushvalue
             0x141A116C0ull, // lua_pcall
+            0x141A11770ull, // lua_pushcclosure
+            
             0x140926730ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetChangeLocationMenuParameterByLocationI
             0x140926860ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetMbFreeChangeLocationMenuParameter
             0x140926940ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetPhotoAdditionalTextLangId

@@ -65,6 +65,7 @@ namespace AddressSetRuntime
             0x14C1D7C10ull, // lua_gettable
             0x14C1E87E0ull, // lua_pushvalue
             0x141A11930ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
+            0x14C1E67B0ull, // lua_pushcclosure
             
             0x145F785D0ull, // GetChangeLocationMenuParameterByLocationId
             0x145F78B90ull, // GetMbFreeChangeLocationMenuParameter

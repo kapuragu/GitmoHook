@@ -30,18 +30,18 @@ namespace
 
     static constexpr int LUA_GLOBALSINDEX_51 = -10002;
 
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pcall = 0x141A116C0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnumber = 0x141A11950ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushstring = 0x141A11970ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushboolean = 0x141A11750ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnil = 0x141A11930ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettop = 0x141A112E0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_settop = 0x141A11F70ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x141A111E0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x141A12300ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A12150ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x141A119D0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset    = 0x141A11B20ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pcall = 0x141A11AB0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnumber = 0x141A11BC0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushstring = 0x14C1E7EE0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushboolean = 0x14C1DB230ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnil = 0x14C1E7CC0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettop = 0x14C1D7D40ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_settop = 0x14C1EBBE0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x14C1D7320ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x14C1ED760ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A123C0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x14C1E87E0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset    = 0x14C1E9CF0ull;
 
     static uintptr_t GetLuaBridgeAddress(uintptr_t resolvedAddr,
         uintptr_t bootstrapAddr)

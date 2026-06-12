@@ -31,7 +31,7 @@ static void SetupConsole()
     freopen_s(&fp, "CONOUT$", "w", stderr);
     freopen_s(&fp, "CONIN$", "r", stdin);
 
-    SetConsoleTitleW(L"V_FrameWork");
+    SetConsoleTitleW(L"GitmoHook");
     gConsoleReady.store(true);
 
     printf("[DLL] Console ready\n");
@@ -44,6 +44,8 @@ static DWORD WINAPI InitThread(LPVOID)
     SetupConsole();
     #endif
 
+    InitLog();
+
     Log("[DLL] InitThread started.\n");
 
     HMODULE hGame = GetModuleHandleW(nullptr);
@@ -53,9 +55,6 @@ static DWORD WINAPI InitThread(LPVOID)
     if (st != MH_OK && st != MH_ERROR_ALREADY_INITIALIZED)
         return 0;
 
-    const bool earlyLuaBridgeOk = Install_SetLuaFunctions_Hook();
-    Log("[DLL] Early Install_SetLuaFunctions_Hook -> %s\n", earlyLuaBridgeOk ? "OK" : "FAIL");
-
     if (!ResolveAddressSet(hGame))
     {
         Log("[DLL] ResolveAddressSet failed.\n");
@@ -63,8 +62,6 @@ static DWORD WINAPI InitThread(LPVOID)
     }
 
     RegisterBuiltInFeatureModules();
-
-
 
     const bool allOk = FeatureModuleRegistry::Instance().InstallAll(hGame);
     Log("[DLL] FeatureModuleRegistry::InstallAll -> %s\n", allOk ? "OK" : "PARTIAL/FAIL");
@@ -76,7 +73,20 @@ static DWORD WINAPI InitThread(LPVOID)
 static void UninstallAll(bool processTerminating)
 {
     if (processTerminating)
+    {
+
+
+        Log("[DLL] DLL_PROCESS_DETACH: process terminating, skipping "
+            "FeatureModule uninstall (per MSDN guidance — other DLLs "
+            "may already be unloaded). OS will reclaim address space.\n");
+        fflush(stdout);
+        fflush(stderr);
+        CloseLog();
+
+        if (gConsoleReady.load())
+            FreeConsole();
         return;
+    }
 
     FeatureModuleRegistry::Instance().UninstallAll();
     MH_Uninitialize();
@@ -84,6 +94,11 @@ static void UninstallAll(bool processTerminating)
 
     fflush(stdout);
     fflush(stderr);
+
+    CloseLog();
+
+    if (gConsoleReady.load())
+        FreeConsole();
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
@@ -97,6 +112,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
         bool expected = false;
         if (!gStarted.compare_exchange_strong(expected, true))
             return TRUE;
+
+        ResolveAddressSet(GetModuleHandleW(nullptr));
 
         HANDLE hThread = CreateThread(nullptr, 0, InitThread, nullptr, 0, nullptr);
         if (hThread)

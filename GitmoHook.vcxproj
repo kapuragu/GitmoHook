@@ -167,6 +167,7 @@
     <ClInclude Include="src\hooks\HeliVoice.h" />
     <ClInclude Include="src\hooks\LoadingScreen.h" />
     <ClInclude Include="src\hooks\LostHostageHook.h" />
+    <ClInclude Include="src\hooks\LuaApi.h" />
     <ClInclude Include="src\hooks\LuaBroadcaster.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\hooks\HeliVoice.cpp" />
     <ClCompile Include="src\hooks\LoadingScreen.cpp" />
     <ClCompile Include="src\hooks\LostHostageHook.cpp" />
+    <ClCompile Include="src\hooks\LuaApi.cpp" />
     <ClCompile Include="src\hooks\LuaBroadcaster.cpp" />
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />

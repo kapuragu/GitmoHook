@@ -64,7 +64,9 @@ namespace AddressSetRuntime
             0x141A11540ull, // lua_next
             0x141A111F0ull, // lua_gettable
             0x141A11910ull, // lua_pushvalue
-            0x141A11600ull, // lua_pcall (thunk → .text:lua_pcall body at 0x14C1DAFF0)
+            0x141A11600ull, // lua_pcall
+            0x141A116B0ull, // lua_pushcclosure
+            
             0x140926640ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetChangeLocationMenuParameterByLocationI
             0x140926770ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetMbFreeChangeLocationMenuParameter
             0x140926840ull,//tpp::ui::menu::MotherBaseMissionCommonData::GetPhotoAdditionalTextLangId
@@ -95,7 +97,7 @@ namespace AddressSetRuntime
             0x14226BED8ull, // Play_bgm_gameover_paradox_soundId
             0x14226BEDCull, // Stop_bgm_gameover_paradox_soundId
             
-            0x0ull,//TelopStartTitleEvCall_BgTexture
+            0x1408a8f50ull,//tpp::ui::hud::TelopStartTitleEvCall::SetBgTexture
             
             0x14033E860ull, // Fox_Sd_Ad_AudioSoundEngine_RegisterGameObject
             0x14032AFA0ull, // Fox_Sd_Object_Activate

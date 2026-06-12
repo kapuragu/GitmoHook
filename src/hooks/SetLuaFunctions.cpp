@@ -3,6 +3,7 @@
 #include "GameOverMusic.h"
 #include "HeliVoice.h"
 #include "LostHostageHook.h"
+#include "LuaApi.h"
 #include "pch.h"
 #include "SoldierObjectRtpc.h"
 #include "State_EnterStandHoldup1.h"
@@ -33,211 +34,28 @@ extern "C" {
 #include "LoadingScreen.h"
 #include "SetEquipBackgroundTexture.h"
 
+
 namespace
 {
     using SetLuaFunctions_t = void(__fastcall*)(lua_State* L);
-    using FoxLuaRegisterLibrary_t = void(__fastcall*)(lua_State* L, const char* libName, luaL_Reg* funcs);
-    using lua_tolstring_t = const char* (__fastcall*)(lua_State* L, int idx, size_t* len);
-    using lua_tointeger_t = long long(__fastcall*)(lua_State* L, int idx);
-    using lua_tonumber_t = lua_Number(__fastcall*)(lua_State* L, int idx);
-    using lua_pushnumber_t = void(__fastcall*)(lua_State* L, lua_Number n);
-    using lua_toboolean_t = int(__fastcall*)(lua_State* L, int idx);
-    using lua_gettop_t = int(__fastcall*)(lua_State* L);
-    using lua_settop_t = void(__fastcall*)(lua_State* L, int idx);
-    using lua_getfield_t = void(__fastcall*)(lua_State* L, int idx, char* k);
-    using lua_rawgeti_t = void(__fastcall*)(lua_State* L, int idx, int n);
-    using lua_type_t = int(__fastcall*)(lua_State* L, int idx);
-    using lua_isstring_t = int(__fastcall*)(lua_State* L, int idx);
-    using lua_isnumber_t = int(__fastcall*)(lua_State* L, int idx);
-    using lua_objlen_t = size_t(__fastcall*)(lua_State* L, int idx);
-    using lua_pushboolean_t = void(__fastcall*)(lua_State* L, int b);
-    using lua_pushstring_t = void(__fastcall*)(lua_State* L, char* s);
-    using lua_createtable_t = void(__fastcall*)(lua_State* L, int narr, int nrec);
-    using lua_rawset_t = void(__fastcall*)(lua_State* L, int idx);
-    using lua_settable_t = void(__fastcall*)(lua_State* L, int idx);
-    using lua_pushnil_t = void(__fastcall*)(lua_State* L);
-    using lua_next_t = int(__fastcall*)(lua_State* L, int idx);
-    using lua_gettable_t = void(__fastcall*)(lua_State* L, int idx);
-    using lua_pushvalue_t = void(__fastcall*)(lua_State* L, int idx);
 
-    static constexpr int LUA_GLOBALSINDEX_51 = -10002;
 
-    // English bootstrap addresses for the Lua bridge.
-    // These are used before version_info.txt is resolved so the bridge can hook as early as the original build.
-    static constexpr uintptr_t BOOTSTRAP_EN_SetLuaFunctions = 0x1408d81f0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_FoxLuaRegisterLibrary = 0x14006b8c0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A12150ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tointeger = 0x141A12120ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tonumber = 0x141A121F0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnumber = 0x141A11950ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_toboolean = 0x141A120C0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettop = 0x141A112E0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_settop = 0x141A11F70ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x141A111E0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawgeti = 0x141A11AE0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x141A12300ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_isstring = 0x141A11440ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_isnumber = 0x141A11410ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_objlen = 0x141A11640ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushboolean = 0x141A11750ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushstring = 0x141A11970ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_createtable = 0x141A10E80ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset = 0x141A11B20ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_settable = 0x141A11F40ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnil = 0x141A11930ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_next = 0x141A11600ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettable = 0x141A112B0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x141A119D0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_SetLuaFunctions = 0x1408D81F0ull;
 
     static SetLuaFunctions_t       g_OrigSetLuaFunctions = nullptr;
-    static FoxLuaRegisterLibrary_t g_FoxLuaRegisterLibrary = nullptr;
-    static lua_tolstring_t         g_lua_tolstring = nullptr;
-    static lua_tointeger_t         g_lua_tointeger = nullptr;
-    static lua_tonumber_t          g_lua_tonumber = nullptr;
-    static lua_pushnumber_t        g_lua_pushnumber = nullptr;
-    static lua_toboolean_t         g_lua_toboolean = nullptr;
-    static lua_gettop_t            g_lua_gettop = nullptr;
-    static lua_settop_t            g_lua_settop = nullptr;
-    static lua_getfield_t          g_lua_getfield = nullptr;
-    static lua_rawgeti_t           g_lua_rawgeti = nullptr;
-    static lua_type_t              g_lua_type = nullptr;
-    static lua_isstring_t          g_lua_isstring = nullptr;
-    static lua_isnumber_t          g_lua_isnumber = nullptr;
-    static lua_objlen_t            g_lua_objlen = nullptr;
-    static lua_pushboolean_t       g_lua_pushboolean = nullptr;
-    static lua_pushstring_t        g_lua_pushstring = nullptr;
-    static lua_createtable_t       g_lua_createtable = nullptr;
-    static lua_rawset_t            g_lua_rawset = nullptr;
-    static lua_settable_t          g_lua_settable = nullptr;
-    static lua_pushnil_t           g_lua_pushnil = nullptr;
-    static lua_next_t              g_lua_next = nullptr;
-    static lua_gettable_t          g_lua_gettable = nullptr;
-    static lua_pushvalue_t         g_lua_pushvalue = nullptr;
 
     static std::unordered_set<lua_State*> g_RegisteredLuaStates;
     static std::mutex g_RegisteredLuaStatesMutex;
     static bool g_SetLuaFunctionsHookInstalled = false;
 }
 
-// Returns one Lua bridge address, using the resolved address set when available and the original English bootstrap address otherwise.
-// Params: resolvedAddr, bootstrapAddr
+
 static uintptr_t GetLuaBridgeAddress(uintptr_t resolvedAddr, uintptr_t bootstrapAddr)
 {
     return resolvedAddr ? resolvedAddr : bootstrapAddr;
 }
 
-// Resolves the Lua/game functions used by this file.
-// Params: none
-static bool ResolveLuaApi()
-{
-    if (!g_FoxLuaRegisterLibrary)
-        g_FoxLuaRegisterLibrary = reinterpret_cast<FoxLuaRegisterLibrary_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.FoxLuaRegisterLibrary, BOOTSTRAP_EN_FoxLuaRegisterLibrary)));
 
-    if (!g_lua_tolstring)
-        g_lua_tolstring = reinterpret_cast<lua_tolstring_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_tolstring, BOOTSTRAP_EN_lua_tolstring)));
-
-    if (!g_lua_tointeger)
-        g_lua_tointeger = reinterpret_cast<lua_tointeger_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_tointeger, BOOTSTRAP_EN_lua_tointeger)));
-
-    if (!g_lua_tonumber)
-        g_lua_tonumber = reinterpret_cast<lua_tonumber_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_tonumber, BOOTSTRAP_EN_lua_tonumber)));
-
-    if (!g_lua_toboolean)
-        g_lua_toboolean = reinterpret_cast<lua_toboolean_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_toboolean, BOOTSTRAP_EN_lua_toboolean)));
-
-    if (!g_lua_pushnumber)
-        g_lua_pushnumber = reinterpret_cast<lua_pushnumber_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_pushnumber, BOOTSTRAP_EN_lua_pushnumber)));
-
-    if (!g_lua_gettop)
-        g_lua_gettop = reinterpret_cast<lua_gettop_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_gettop, BOOTSTRAP_EN_lua_gettop)));
-
-    if (!g_lua_settop)
-        g_lua_settop = reinterpret_cast<lua_settop_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_settop, BOOTSTRAP_EN_lua_settop)));
-
-    if (!g_lua_getfield)
-        g_lua_getfield = reinterpret_cast<lua_getfield_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_getfield, BOOTSTRAP_EN_lua_getfield)));
-
-    if (!g_lua_rawgeti)
-        g_lua_rawgeti = reinterpret_cast<lua_rawgeti_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_rawgeti, BOOTSTRAP_EN_lua_rawgeti)));
-
-    if (!g_lua_type)
-        g_lua_type = reinterpret_cast<lua_type_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_type, BOOTSTRAP_EN_lua_type)));
-
-    if (!g_lua_isstring)
-        g_lua_isstring = reinterpret_cast<lua_isstring_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_isstring, BOOTSTRAP_EN_lua_isstring)));
-
-    if (!g_lua_isnumber)
-        g_lua_isnumber = reinterpret_cast<lua_isnumber_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_isnumber, BOOTSTRAP_EN_lua_isnumber)));
-
-    if (!g_lua_objlen)
-        g_lua_objlen = reinterpret_cast<lua_objlen_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_objlen, BOOTSTRAP_EN_lua_objlen)));
-
-    if (!g_lua_pushboolean)
-        g_lua_pushboolean = reinterpret_cast<lua_pushboolean_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_pushboolean, BOOTSTRAP_EN_lua_pushboolean)));
-
-    if (!g_lua_pushstring)
-        g_lua_pushstring = reinterpret_cast<lua_pushstring_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_pushstring, BOOTSTRAP_EN_lua_pushstring)));
-
-    if (!g_lua_createtable)
-        g_lua_createtable = reinterpret_cast<lua_createtable_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_createtable, BOOTSTRAP_EN_lua_createtable)));
-
-    if (!g_lua_rawset)
-        g_lua_rawset = reinterpret_cast<lua_rawset_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_rawset, BOOTSTRAP_EN_lua_rawset)));
-
-    if (!g_lua_settable)
-        g_lua_settable = reinterpret_cast<lua_settable_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_settable, BOOTSTRAP_EN_lua_settable)));
-
-    if (!g_lua_pushnil)
-        g_lua_pushnil = reinterpret_cast<lua_pushnil_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_pushnil, BOOTSTRAP_EN_lua_pushnil)));
-
-    if (!g_lua_next)
-        g_lua_next = reinterpret_cast<lua_next_t>(ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_next, BOOTSTRAP_EN_lua_next)));
-
-    if (!g_lua_gettable)
-        g_lua_gettable = reinterpret_cast<lua_gettable_t>(
-            ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_gettable, BOOTSTRAP_EN_lua_gettable)));
-
-    if (!g_lua_pushvalue)
-        g_lua_pushvalue = reinterpret_cast<lua_pushvalue_t>(
-            ResolveGameAddress(GetLuaBridgeAddress(gAddr.lua_pushvalue, BOOTSTRAP_EN_lua_pushvalue)));
-
-    return g_FoxLuaRegisterLibrary &&
-        g_lua_tolstring &&
-        g_lua_tointeger &&
-        g_lua_tonumber &&
-        g_lua_toboolean &&
-        g_lua_pushnumber &&
-        g_lua_gettop &&
-        g_lua_settop &&
-        g_lua_getfield &&
-        g_lua_gettable &&
-        g_lua_rawgeti &&
-        g_lua_type &&
-        g_lua_isstring &&
-        g_lua_isnumber &&
-        g_lua_objlen &&
-        g_lua_pushboolean &&
-        g_lua_pushvalue &&
-        g_lua_pushstring &&
-        g_lua_createtable &&
-        g_lua_rawset &&
-        g_lua_settable &&
-        g_lua_pushnil &&
-        g_lua_next;
-}
-
-// Returns the current Lua stack top.
-// Params: L
-static int GetLuaTop(lua_State* L)
-{
-    if (!ResolveLuaApi() || !g_lua_gettop)
-        return 0;
-
-    return g_lua_gettop(L);
-}
-
-// Sets the Lua stack top.
-// Params: L, idx
 static void SetLuaTop(lua_State* L, int idx)
 {
     if (!ResolveLuaApi() || !g_lua_settop)
@@ -246,192 +64,14 @@ static void SetLuaTop(lua_State* L, int idx)
     g_lua_settop(L, idx);
 }
 
-// Pushes one table field onto the stack.
-// Params: L, idx, fieldName
-static void LuaGetField(lua_State* L, int idx, const char* fieldName)
-{
-    if (!ResolveLuaApi() || !g_lua_getfield || !fieldName)
-        return;
 
-    g_lua_getfield(L, idx, const_cast<char*>(fieldName));
-}
-
-// Pushes one array entry onto the stack.
-// Params: L, idx, n
-static void LuaRawGetI(lua_State* L, int idx, int n)
-{
-    if (!ResolveLuaApi() || !g_lua_rawgeti)
-        return;
-
-    g_lua_rawgeti(L, idx, n);
-}
-
-// Returns the Lua value type.
-// Params: L, idx
-static int LuaType(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_type)
-        return -1;
-
-    return g_lua_type(L, idx);
-}
-
-// Returns true if one Lua value is a string.
-// Params: L, idx
-static bool LuaIsString(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_isstring)
-        return false;
-
-    return g_lua_isstring(L, idx) != 0;
-}
-
-// Returns true if one Lua value is a number.
-// Params: L, idx
-static bool LuaIsNumber(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_isnumber)
-        return false;
-
-    return g_lua_isnumber(L, idx) != 0;
-}
-
-// Returns the Lua object length.
-// Params: L, idx
-static size_t LuaObjLen(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_objlen)
-        return 0;
-
-    return g_lua_objlen(L, idx);
-}
-
-// Pushes one boolean back to Lua.
-// Params: L, value
-static void PushLuaBool(lua_State* L, bool value)
-{
-    if (!ResolveLuaApi() || !g_lua_pushboolean)
-        return;
-
-    g_lua_pushboolean(L, value ? 1 : 0);
-}
-
-// Pops values from the Lua stack.
-// Params: L, count
-static void LuaPop(lua_State* L, int count)
-{
-    if (!ResolveLuaApi() || !g_lua_settop)
-        return;
-
-    g_lua_settop(L, -count - 1);
-}
-
-// Registers one C library into Fox Lua.
-// Params: L, libName, funcs
-static bool RegisterLuaLibrary(lua_State* L, const char* libName, luaL_Reg* funcs)
-{
-    if (!ResolveLuaApi() || !L || !libName || !funcs)
-        return false;
-
-    g_FoxLuaRegisterLibrary(L, libName, funcs);
-    Log("[V_FrameWork] Registered library: %s (L=%p)\n", libName, L);
-    return true;
-}
-
-// Returns a Lua string argument.
-// Params: L, idx
-static const char* GetLuaString(lua_State* L, int idx)
-{
-        Log("[GitmoHook] GetLuaString 1\n");
-    if (!ResolveLuaApi() || !g_lua_tolstring)
-    {
-        Log("[GitmoHook] GetLuaString nullptr\n");
-        return nullptr;
-    }
-        Log("[GitmoHook] GetLuaString 3\n");
-
-    return g_lua_tolstring(L, idx, nullptr);
-}
-
-// Returns a Lua int argument.
-// Params: L, idx
-static int GetLuaInt(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_tointeger)
-        return 0;
-
-    return static_cast<int>(g_lua_tointeger(L, idx));
-}
-
-// Returns a Lua int64 argument.
-// Params: L, idx
-static std::uint64_t GetLuaInt64(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_tointeger)
-        return 0;
-
-    return static_cast<std::uint64_t>(g_lua_tointeger(L, idx));
-}
-
-// Returns a Lua bool argument.
-// Params: L, idx
-static bool GetLuaBool(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_toboolean)
-        return false;
-
-    return g_lua_toboolean(L, idx) != 0;
-}
-
-// Returns a Lua float argument.
-// Params: L, idx
-static float GetLuaNumber(lua_State* L, int idx)
-{
-    if (!ResolveLuaApi() || !g_lua_tonumber)
-        return 0.0f;
-
-    return static_cast<float>(g_lua_tonumber(L, idx));
-}
-
-// Pushes one float back to Lua.
-// Params: L, value
-static void PushLuaNumber(lua_State* L, float value)
-{
-    if (!ResolveLuaApi() || !g_lua_pushnumber)
-        return;
-
-    g_lua_pushnumber(L, static_cast<lua_Number>(value));
-}
-
-static std::uint32_t GetLuaStrCode32Arg(lua_State* L, int idx)
-{
-    if (GetLuaTop(L) < idx)
-        return 0u;
-
-    if (LuaIsString(L, idx))
-    {
-        const char* s = GetLuaString(L, idx);
-        if (!s || !s[0])
-            return 0u;
-        return FoxHashes::StrCode32(s);
-    }
-
-    if (LuaIsNumber(L, idx))
-        return static_cast<std::uint32_t>(GetLuaInt64(L, idx));
-
-    return 0u;
-}
-
-// Returns true if this Lua state was already registered.
-// Params: L
 static bool IsLuaStateRegistered(lua_State* L)
 {
     std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
     return g_RegisteredLuaStates.find(L) != g_RegisteredLuaStates.end();
 }
 
-// Tracks one Lua state after registration.
-// Params: L
+
 static void TrackLuaState(lua_State* L)
 {
     std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
@@ -445,16 +85,14 @@ lua_State* GitmoHook_AnyLuaState()
     return *g_RegisteredLuaStates.begin();
 }
 
-// Clears tracked Lua states.
-// Params: none
+
 static void ClearTrackedLuaStates()
 {
     std::lock_guard<std::mutex> lock(g_RegisteredLuaStatesMutex);
     g_RegisteredLuaStates.clear();
 }
 
-// Reads one required string field from a Lua table.
-// Params: L, fieldName, outValue
+
 static bool LuaReadRequiredStringField(lua_State* L, const char* fieldName, std::string& outValue)
 {
     outValue.clear();
@@ -488,8 +126,7 @@ static double LuaToNumber(lua_State* L, int idx)
     return static_cast<double>(g_lua_tonumber(L, idx));
 }
 
-// Reads one optional signed integer field from a Lua table.
-// Params: L, fieldName, defaultValue
+
 static std::int32_t LuaReadOptionalIntField(lua_State* L, const char* fieldName, std::int32_t defaultValue)
 {
     LuaGetField(L, -1, fieldName);
@@ -504,8 +141,7 @@ static std::int32_t LuaReadOptionalIntField(lua_State* L, const char* fieldName,
     return value;
 }
 
-// Reads one optional unsigned integer field from a Lua table.
-// Params: L, fieldName, defaultValue
+
 static std::uint32_t LuaReadOptionalUIntField(lua_State* L, const char* fieldName, std::uint32_t defaultValue)
 {
     LuaGetField(L, -1, fieldName);
@@ -558,6 +194,32 @@ static bool TryReadTableBoolField(lua_State* L, int tableIndex, const char* fiel
 
     SetLuaTop(L, -2);
     return result;
+}
+
+
+static bool TryReadTableSubAssetField(
+    lua_State* L, int tableIndex, const char* fieldName,
+    const char*& outPath, bool& outVanilla, bool defaultVanilla)
+{
+    outPath = nullptr;
+    outVanilla = defaultVanilla;
+
+    LuaGetField(L, tableIndex, const_cast<char*>(fieldName));
+    const int type = LuaType(L, -1);
+
+    if (type == 4)
+    {
+        outPath = GetLuaString(L, -1);
+        outVanilla = false;
+    }
+    else if (type == 1)
+    {
+        outVanilla = GetLuaBool(L, -1);
+    }
+
+
+    SetLuaTop(L, -2);
+    return true;
 }
 
 static void LuaPushString(lua_State* L, const char* value)
@@ -622,6 +284,12 @@ static void LuaPushValue(lua_State* L, int idx)
         return;
 
     g_lua_pushvalue(L, idx);
+}
+
+static void PushLuaUInt32(lua_State* L, std::uint32_t v)
+{
+    if (ResolveLuaApi() && g_lua_pushnumber)
+        g_lua_pushnumber(L, static_cast<lua_Number>(static_cast<double>(v)));
 }
 
 //----------------
@@ -972,6 +640,7 @@ bool Install_SetLuaFunctions_Hook()
 
     ResolveLuaApi();
 
+    
     const uintptr_t setLuaFunctionsAddr = GetLuaBridgeAddress(gAddr.SetLuaFunctions, BOOTSTRAP_EN_SetLuaFunctions);
     void* target = ResolveGameAddress(setLuaFunctionsAddr);
     if (!target)

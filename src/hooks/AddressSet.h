@@ -73,6 +73,7 @@ namespace AddressSetRuntime
         uintptr_t lua_gettable = 0;
         uintptr_t lua_pushvalue = 0;
         uintptr_t lua_pcall = 0;
+        uintptr_t lua_pushcclosure = 0;
 
         uintptr_t GetChangeLocationMenuParameterByLocationId = 0;
         uintptr_t GetMbFreeChangeLocationMenuParameter = 0;
