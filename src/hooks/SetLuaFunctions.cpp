@@ -65,29 +65,29 @@ namespace
     // English bootstrap addresses for the Lua bridge.
     // These are used before version_info.txt is resolved so the bridge can hook as early as the original build.
     static constexpr uintptr_t BOOTSTRAP_EN_SetLuaFunctions = 0x1408D78A0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_FoxLuaRegisterLibrary = 0x14006B6D0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A123C0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tointeger = 0x141A12390ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_tonumber = 0x141A12460ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnumber = 0x141A11BC0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_toboolean = 0x141A12330ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettop = 0x14C1D7D40ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_settop = 0x14C1EBBE0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x14C1D7320ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawgeti = 0x14C1E9320ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x14C1ED760ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_isstring = 0x14C1D9250ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_isnumber = 0x14C1D8C90ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_objlen = 0x14C1DA960ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushboolean = 0x14C1DB230ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushstring = 0x14C1E7EE0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_createtable = 0x14C1D6320ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset = 0x14C1E9CF0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_settable = 0x14C1EB2B0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnil = 0x14C1E7CC0ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_next = 0x14C1DA770ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettable = 0x14C1D7C10ull;
-    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x14C1E87E0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_FoxLuaRegisterLibrary = 0x14006b8c0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_tolstring = 0x141A12150ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_tointeger = 0x141A12120ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_tonumber = 0x141A121F0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnumber = 0x141A11950ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_toboolean = 0x141A120C0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettop = 0x141A112E0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_settop = 0x141A11F70ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_getfield = 0x141A111E0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawgeti = 0x141A11AE0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_type = 0x141A12300ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_isstring = 0x141A11440ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_isnumber = 0x141A11410ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_objlen = 0x141A11640ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushboolean = 0x141A11750ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushstring = 0x141A11970ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_createtable = 0x141A10E80ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_rawset = 0x141A11B20ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_settable = 0x141A11F40ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushnil = 0x141A11930ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_next = 0x141A11600ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_gettable = 0x141A112B0ull;
+    static constexpr uintptr_t BOOTSTRAP_EN_lua_pushvalue = 0x141A119D0ull;
 
     static SetLuaFunctions_t       g_OrigSetLuaFunctions = nullptr;
     static FoxLuaRegisterLibrary_t g_FoxLuaRegisterLibrary = nullptr;
@@ -342,8 +342,13 @@ static bool RegisterLuaLibrary(lua_State* L, const char* libName, luaL_Reg* func
 // Params: L, idx
 static const char* GetLuaString(lua_State* L, int idx)
 {
+        Log("[GitmoHook] GetLuaString 1\n");
     if (!ResolveLuaApi() || !g_lua_tolstring)
+    {
+        Log("[GitmoHook] GetLuaString nullptr\n");
         return nullptr;
+    }
+        Log("[GitmoHook] GetLuaString 3\n");
 
     return g_lua_tolstring(L, idx, nullptr);
 }
@@ -707,16 +712,24 @@ static int __cdecl l_AddPhotoAdditionalText(lua_State* L)
 
 static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
 {
+    Log("[GitmoHook] l_SetHeliDialogueEvents start\n");
     const bool isEnable = GetLuaBool(L, 1);
+    Log("[GitmoHook] l_SetHeliDialogueEvents 1\n");
     if (isEnable)
     {
+        Log("[GitmoHook] isEnable 1\n");
         const char* dialogueEvent1 = GetLuaString(L, 2);
+        Log("[GitmoHook] isEnable 2\n");
         const char* dialogueEvent2 = GetLuaString(L, 3);
+        Log("[GitmoHook] isEnable 3\n");
         bool success = SetEnableHeliVoice(isEnable,dialogueEvent1,dialogueEvent2);
+        Log("[GitmoHook] isEnable 4\n");
         return success ? 1 : 0;
     }
+    Log("[GitmoHook] l_SetHeliDialogueEvents 2\n");
     
     bool success = SetEnableHeliVoice(isEnable,"","");
+    Log("[GitmoHook] l_SetHeliDialogueEvents 3\n");
     return success ? 1 : 0;
 }
 
