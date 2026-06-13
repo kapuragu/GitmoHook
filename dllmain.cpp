@@ -42,9 +42,9 @@ static DWORD WINAPI InitThread(LPVOID)
 {
     #ifdef _DEBUG
     SetupConsole();
-    #endif
 
     InitLog();
+    #endif
 
     Log("[DLL] InitThread started.\n");
 

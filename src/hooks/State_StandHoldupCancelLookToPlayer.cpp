@@ -167,6 +167,9 @@ static void EmitHoldupCancelLookToPlayerMessage(uint32_t soldierIndex)
 
 static std::atomic<uint64_t> gDetourHits{ 0 };
 
+// Global toggle controlled from Lua.
+static bool g_UseCancelLookToPlayerVoice = false;
+
 static void __fastcall Hook_State(void* holdupThis, uint64_t id, int phase)
 {
     if (gOrig_State)
@@ -198,6 +201,9 @@ static void __fastcall Hook_State(void* holdupThis, uint64_t id, int phase)
         (static_cast<uint64_t>(reinterpret_cast<uintptr_t>(holdupThis)) >> 4) ^
         (static_cast<uint64_t>(holdupId) << 32) ^
         static_cast<uint64_t>(lineId);
+    
+    if (!g_UseCancelLookToPlayerVoice)
+        return;
 
     TrySpeak_EnterDownHoldupStyle(holdupThis, holdupId, lineId);
 
@@ -207,6 +213,23 @@ static void __fastcall Hook_State(void* holdupThis, uint64_t id, int phase)
         Log("[Holdup] SPEAK attempt #%llu phase=1 holdupId=%u soldierIndex=%u line=0x%08X this=%p slot=%p\n",
             (unsigned long long)n, holdupId, soldierIndex, lineId, holdupThis, (void*)slot);
     }
+}
+
+// Enables or disables the cowardly holdup reaction replacement.
+// Params: enabled
+void Set_UseCancelLookToPlayerVoice(bool enabled)
+{
+    g_UseCancelLookToPlayerVoice = enabled;
+
+    Log("[CancelLookToPlayerVoice] %s\n",
+        enabled ? "ON" : "OFF");
+}
+
+// Returns whether the cowardly holdup reaction replacement is enabled.
+// Params: none
+bool Get_UseCancelLookToPlayerVoice()
+{
+    return g_UseCancelLookToPlayerVoice;
 }
 
 

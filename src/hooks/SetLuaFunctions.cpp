@@ -34,6 +34,7 @@ extern "C" {
 #include "LoadingScreen.h"
 #include "SetEquipBackgroundTexture.h"
 
+void Set_UseCancelLookToPlayerVoice(bool enabled);
 
 namespace
 {
@@ -409,6 +410,13 @@ static int l_HoldUpReactionCowardlyReactions(lua_State* L)
     return 0;
 }
 
+static int l_SetCancelLookToPlayerVoice(lua_State* L)
+{
+    const bool enabled = GetLuaBool(L, 1);
+    Set_UseCancelLookToPlayerVoice(enabled);
+    return 0;
+}
+
 // Sets the caution timer override.
 // Params: seconds
 static int l_SetCautionStepNormalDurationSeconds(lua_State* L)
@@ -556,7 +564,7 @@ static luaL_Reg g_GitmoHook[] =
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
     { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },
-    { "HoldUpReactionCowardlyReaction",         l_HoldUpReactionCowardlyReactions },
+    { "SetCancelLookToPlayerVoice",         l_SetCancelLookToPlayerVoice },
         
     { "SetCautionStepNormalDurationSeconds",    l_SetCautionStepNormalDurationSeconds },
     { "GetCautionStepNormalDurationSeconds",    l_GetCautionStepNormalDurationSeconds },
