@@ -111,6 +111,9 @@ namespace AddressSetRuntime
             0x147922a40ull, // GetGameObjectIdWithIndex
             
             0x142C1FD44ull, // MessageResendCounter
+            
+            0x140d7c770ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::UpdateAntiAir
+            0x140d769b0ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::ClearAntiAir
         };
 
         return value;

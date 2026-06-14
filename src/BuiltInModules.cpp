@@ -8,6 +8,7 @@
 #include "hooks/BasicActionImpl_StateCrawlSideRoll.h"
 #include "hooks/SoldierVoiceTypeQuery.h"
 #include "hooks/State_EnterStandHoldup1.h"
+#include "hooks/CpAntiAir.h"
 #include "hooks/VIPSoundRecoveryHook.h"
 #include "hooks/VoicePitchOverride.h"
 
@@ -372,6 +373,25 @@ namespace
             Uninstall_BasicActionImpl_StateCrawlSideRoll_Hook();
         }
     };
+
+    class UpdateAntiAirModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "UpdateAntiAir";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            return Install_CpAntiAir_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_CpAntiAir_Hook();
+        }
+    };
 }
 
 void RegisterBuiltInFeatureModules()
@@ -395,6 +415,8 @@ void RegisterBuiltInFeatureModules()
     static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
     static CrawlSideRollModule s_CrawlSideRollModule;
     
+    static UpdateAntiAirModule s_UpdateAntiAirModule;
+    
     static std::once_flag s_Once;
     std::call_once(s_Once, []()
         {
@@ -414,5 +436,6 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
             FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
             FeatureModuleRegistry::Instance().Register(&s_CrawlSideRollModule);
+            FeatureModuleRegistry::Instance().Register(&s_UpdateAntiAirModule);
         });
 }

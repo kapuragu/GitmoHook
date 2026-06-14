@@ -125,10 +125,13 @@ namespace AddressSetRuntime
         uintptr_t Soldier2SoundController_Activate = 0;
         uintptr_t GetQuarkSystemtable = 0;
 
-        uintptr_t BasicActionImpl_StateCrawlSideRoll                    = 0;
+        uintptr_t BasicActionImpl_StateCrawlSideRoll = 0;
         uintptr_t GetGameObjectIdWithIndex = 0;
 
-        uintptr_t MessageResendCounter                                  = 0;
+        uintptr_t MessageResendCounter = 0;
+        
+        uintptr_t UpdateAntiAir = 0;
+        uintptr_t ClearAntiAir = 0;
     };
 
     inline GameBuild& GetGameBuild()
