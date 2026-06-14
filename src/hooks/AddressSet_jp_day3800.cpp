@@ -112,8 +112,8 @@ namespace AddressSetRuntime
             
             0x142C1FD44ull, // MessageResendCounter
             
-            0x0ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::UpdateAntiAir
-            0x0ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::ClearAntiAir
+            0x140d7c720ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::UpdateAntiAir
+            0x140d76960ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::ClearAntiAir
         };
 
         return value;
