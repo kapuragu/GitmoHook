@@ -381,7 +381,7 @@ void RegisterBuiltInFeatureModules()
     static LoadingScreenModule s_LoadingScreenModule;
     static SetEquipBackgroundTextureModule s_SetEquipBackgroundTextureModule;
     //static ChangeLocationMenuModule s_ChangeLocationMenuModule;
-    static PhotoAdditionalTextModule s_PhotoAdditionalTextModule;
+    //static PhotoAdditionalTextModule s_PhotoAdditionalTextModule;
     static CautionTimerModule s_CautionTimerModule;
     //static HoldUpReactionCowardlyReactionsModule s_HoldUpReactionCowardlyReactionsModule;
     
@@ -403,7 +403,7 @@ void RegisterBuiltInFeatureModules()
             FeatureModuleRegistry::Instance().Register(&s_LoadingScreenModule);
             FeatureModuleRegistry::Instance().Register(&s_SetEquipBackgroundTextureModule);
             //FeatureModuleRegistry::Instance().Register(&s_ChangeLocationMenuModule);
-            FeatureModuleRegistry::Instance().Register(&s_PhotoAdditionalTextModule);
+            //FeatureModuleRegistry::Instance().Register(&s_PhotoAdditionalTextModule);
             FeatureModuleRegistry::Instance().Register(&s_CautionTimerModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPSleepFaintModule);
             FeatureModuleRegistry::Instance().Register(&s_VIPHoldupModule);
