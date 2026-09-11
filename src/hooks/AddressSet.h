@@ -132,6 +132,18 @@ namespace AddressSetRuntime
         
         uintptr_t UpdateAntiAir = 0;
         uintptr_t ClearAntiAir = 0;
+        
+        uintptr_t HideBinocle = 0;
+        
+        uintptr_t StateDoorStart = 0;
+        uintptr_t StateDoorLoop = 0;
+        uintptr_t StateDoorEnd = 0;
+        
+        uintptr_t GetUixUtilityToFeedQuarkEnvironment = 0;
+
+        uintptr_t TelopStartTitleEvCall_SetBgTexture = 0;
+        uintptr_t Layout_GetLayout = 0;
+        uintptr_t Layout_GetModel = 0;
     };
 
     inline GameBuild& GetGameBuild()

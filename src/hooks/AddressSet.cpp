@@ -27,6 +27,23 @@ namespace AddressSetRuntime
 
             return fullPath.substr(0, slash);
         }
+        std::wstring GetModuleFilename(HMODULE hModule)
+        {
+            wchar_t path[MAX_PATH] = {};
+            if (!GetModuleFileNameW(hModule, path, MAX_PATH))
+                return L"";
+            
+            std::wstring fullPath(path);
+            Log("[AddressSet] fileName 1 = %s\n", path);
+            const size_t slash = fullPath.find_last_of(L"\\/");
+            if (slash == std::wstring::npos)
+                return L"";
+            
+            std::wstring fileName = fullPath.substr(1, slash);
+            Log("[AddressSet] fileName 2 = %s\n", fileName.c_str());
+            
+            return fileName.substr(0, fileName.find_last_of(L"."));
+        }
 
         std::string ReadWholeFileUtf8OrAnsi(const std::wstring& path)
         {
@@ -53,9 +70,13 @@ namespace AddressSetRuntime
 
     GameBuild DetectGameBuildFromVersionInfo(HMODULE hGame)
     {
-        const std::wstring dir = GetModuleDirectory(hGame ? hGame : GetModuleHandleW(nullptr));
+        HMODULE hModule = hGame ? hGame : GetModuleHandleW(nullptr);
+        const std::wstring dir = GetModuleDirectory(hModule);
         if (dir.empty())
             return GameBuild::Unknown;
+        
+        std::wstring fileName = GetModuleFilename(hModule);
+        Log("[AddressSet] fileName = %s\n", fileName.c_str());
 
         const std::wstring versionInfoPath = dir + L"\\version_info.txt";
         std::string text = ReadWholeFileUtf8OrAnsi(versionInfoPath);

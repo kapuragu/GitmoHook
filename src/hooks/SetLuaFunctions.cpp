@@ -319,7 +319,7 @@ static int __cdecl l_AddToChangeLocationMenu(lua_State* L)
     for (g_lua_pushnil(L); g_lua_next(L, -2); LuaPop(L, 1)) {
         if ( LuaType( L, -1)==LUA_TNUMBER ) {
             unsigned short locationCode = GetLuaInt(L, -1);
-            Log("{%llX}\n",locationCode);
+            //Log("{%llX}\n",locationCode);
             AddLocationIdToChangeLocationMenu(locationCode);
         }
     }
@@ -383,22 +383,16 @@ static int __cdecl l_SetHeliDialogueEvents(lua_State* L)
 {
     Log("[GitmoHook] l_SetHeliDialogueEvents start\n");
     const bool isEnable = GetLuaBool(L, 1);
-    Log("[GitmoHook] l_SetHeliDialogueEvents 1\n");
+    //Log("[GitmoHook] l_SetHeliDialogueEvents 1\n");
     if (isEnable)
     {
-        Log("[GitmoHook] isEnable 1\n");
         const char* dialogueEvent1 = GetLuaString(L, 2);
-        Log("[GitmoHook] isEnable 2\n");
         const char* dialogueEvent2 = GetLuaString(L, 3);
-        Log("[GitmoHook] isEnable 3\n");
         bool success = SetEnableHeliVoice(isEnable,dialogueEvent1,dialogueEvent2);
-        Log("[GitmoHook] isEnable 4\n");
         return success ? 1 : 0;
     }
-    Log("[GitmoHook] l_SetHeliDialogueEvents 2\n");
     
     bool success = SetEnableHeliVoice(isEnable,"","");
-    Log("[GitmoHook] l_SetHeliDialogueEvents 3\n");
     return success ? 1 : 0;
 }
 
@@ -560,7 +554,7 @@ static int __cdecl l_SetGameOverMusic(lua_State* L)
 
 static luaL_Reg g_GitmoHook[] =
 {   //SetDefaultEquipBgTexturePath is the one that is going to be used in lua.
-    { "SetEnableGzUi", l_SetEnableGzUi },
+    //{ "SetEnableGzUi", l_SetEnableGzUi },
     { "AddToChangeLocationMenu", l_AddToChangeLocationMenu },
     { "AddPhotoAdditionalText", l_AddPhotoAdditionalText },
     { "SetHeliDialogueEvents", l_SetHeliDialogueEvents },

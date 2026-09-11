@@ -1,158 +1,218 @@
 ﻿#include "pch.h"
+
 #include <Windows.h>
 #include <cstdint>
+#include <unordered_map>
 #include <unordered_set>
 
-#include "AddressSet.h"
+#include "FoxHashes.h"
 #include "HookUtils.h"
 #include "log.h"
-#include "FoxHashes.h"
+#include "AddressSet.h"
 #include "MissionCodeGuard.h"
 
-extern "C" {
-    #include "lua.h"
-    #include "lauxlib.h"
-    #include "lualib.h"
-}
-
-// ----------------------------------------------------
-// Engine function types
-// ----------------------------------------------------
-
-using SetEquipBackgroundTexture_t = uint8_t(__fastcall*)(int equipId, void* isSortieWeapon);
-using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk);
-
-// ----------------------------------------------------
-// Originals / engine pointers
-// ----------------------------------------------------
-
-static SetEquipBackgroundTexture_t g_OrigSetEquipBackgroundTexture = nullptr;
-static SetTextureName_t            g_OrigSetTextureName = nullptr;
-
-// ----------------------------------------------------
-// Context
-// ----------------------------------------------------
-
-static thread_local bool g_InSetEquipBackgroundTexture = false;
-static thread_local int  g_CurrentEquipId = -1;
-bool g_isEnableEquipBg = false;
-
-// ----------------------------------------------------
-// Hook 1: capture equipId
-// ----------------------------------------------------
-
-static uint8_t __fastcall hkSetEquipBackgroundTexture(int equipId, void* isSortieWeapon)
+namespace
 {
-    if (MissionCodeGuard::ShouldBypassHooks())
-        return g_OrigSetEquipBackgroundTexture(equipId, isSortieWeapon);
+    using SetWeaponPanelLogo_t = uint8_t(__fastcall*)(int equipId, void* node);
+    using SetTextureName_t = void(__fastcall*)(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk);
+    using GetUixUtility_t = void** (__fastcall*)();
+    using GetQuarkSystemTable_t = void* (__fastcall*)();
+
+    using TexStatusCreate_t = char(__fastcall*)(void*, void*, unsigned);
+
+    TexStatusCreate_t     g_OrigTexStatusCreate = nullptr;
+
+    constexpr uintptr_t   kAddr_TexStatusCreate_En154 = 0x141DBC2D0;
     
-    g_InSetEquipBackgroundTexture = true;
-    g_CurrentEquipId = equipId;
+    bool g_isEnableEquipBg = false;
 
-    const uint8_t result = g_OrigSetEquipBackgroundTexture(equipId, isSortieWeapon);
-
-    g_CurrentEquipId = -1;
-    g_InSetEquipBackgroundTexture = false;
-
-    return result;
-}
-
-static constexpr uint64_t TEX_DEFAULT_ORIG = 0x15695ed8a56ae919ull;
-
-static void __fastcall hkSetTextureName(void* modelNodeMesh, uint64_t textureHash, uint64_t slotHash, int unk)
-{
-    if (MissionCodeGuard::ShouldBypassHooks())
-        return g_OrigSetTextureName(modelNodeMesh, textureHash, slotHash, unk);
-    
-    if (g_InSetEquipBackgroundTexture)
+    bool DescriptorReadableSEH(const void* src)
     {
-        if (g_isEnableEquipBg)
+        const uintptr_t v = reinterpret_cast<uintptr_t>(src);
+        if (v < 0x10000ull || v >= 0x7FFFFFFFFFFFull)
+            return false;
+        __try
         {
-            uint64_t newTexture = 0x156810775f8c8515ull; //default, which been changed to\Assets\tpp\ui\texture\equip_bg\
-
-            switch (g_CurrentEquipId)
-            {
-            case 0x203:
-                /*  Unique arm BG textures: Stun Arm BG
-                    TppEquip.EQP_HAND_STUNARM = 515 */
-                newTexture = 0x15682b4e5f2626d2ull;
-                break;
-            case 0x204:
-                /*  Hand of Jehuty BG
-                    TppEquip.EQP_HAND_JEHUTY = 516 */
-                newTexture = 0x156b6be3346d38acull;
-                break;
-            case 0x205:
-                /*  Hand of Jehuty BG
-                    TppEquip..EQP_HAND_STUN_ROCKET = 517 */
-                newTexture = 0x15684206a365ca64;
-                break;
-
-            case 0x206:
-                /*  Hand of Jehuty BG
-                    TppEquip..EQP_HAND_STUN_ROCKET = 518 */
-                newTexture = 0x1568b462f43ed09full;
-                break;
-
-				//Example for adding more overrides, adjust as needed
-            //case 1070: // Tornado-6
-            //    newTexture = 0x1569327dd1edbb0full; \Assets\tpp\ui\texture\Emblem\front\ui_emb_front_8012_h_alp.ftex
-            //    break;
-
-            default:
-                break;
-            }
-
-            if (newTexture != 0)
-            {
-                //gets called every frame its onscreen
-                /*Log("[SetTextureName] location=40 equipId=%d: 0x%llX -> 0x%llX\n",
-                    g_CurrentEquipId,
-                    static_cast<unsigned long long>(textureHash),
-                    static_cast<unsigned long long>(newTexture));*/
-
-                textureHash = newTexture;
-            }
+            volatile unsigned probe =
+                *reinterpret_cast<const unsigned*>(
+                    static_cast<const char*>(src) + 0x18);
+            (void)probe;
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
         }
     }
 
-    g_OrigSetTextureName(modelNodeMesh, textureHash, slotHash, unk);
-}
+    char __fastcall hkTexStatusCreate(void* out, void* src, unsigned flags)
+    {
+        if (src && !DescriptorReadableSEH(src))
+        {
+            static bool s_Warned = false;
+            if (!s_Warned)
+            {
+                s_Warned = true;
+                Log("[UiTextureGuard] a UI material texture slot holds the "
+                    "corrupt streamer descriptor %p - the bind is skipped so "
+                    "fox::gr::TextureStreamerStatus does not fault on it; "
+                    "that slot draws untextured instead of crashing the "
+                    "render worker\n", src);
+            }
+            return 0;
+        }
+        return g_OrigTexStatusCreate(out, src, flags);
+    }
 
-// ----------------------------------------------------
-// Install
-// ----------------------------------------------------
+    SetWeaponPanelLogo_t  g_OrigSetWeaponPanelLogo = nullptr;
+    SetTextureName_t      g_SetTextureName = nullptr;
+    GetUixUtility_t       g_GetUixUtility = nullptr;
+    GetQuarkSystemTable_t g_GetQuarkSystemTable = nullptr;
+    uint64_t              g_MaskSlot = 0;
+    
+    constexpr uint64_t VANILLA_BG = 0x15695ED8A56AE919ull;
+    
+    constexpr uint64_t NEW_TEXTURE = 0x156810775f8c8515ull; //default, which been changed to\Assets\tpp\ui\texture\equip_bg\
+
+    bool Resolve()
+    {
+        if (!g_SetTextureName)
+            g_SetTextureName = reinterpret_cast<SetTextureName_t>(ResolveGameAddress(gAddr.SetTextureName));
+        if (!g_GetQuarkSystemTable && gAddr.GetQuarkSystemtable != 0)
+            g_GetQuarkSystemTable = reinterpret_cast<GetQuarkSystemTable_t>(ResolveGameAddress(gAddr.GetQuarkSystemtable));
+        if (g_MaskSlot == 0)
+            g_MaskSlot = static_cast<uint64_t>(FoxHashes::StrCode32("Mask_Texture"));
+        return g_SetTextureName != nullptr && g_MaskSlot != 0;
+    }
+
+
+    void Prefetch(uint64_t textureHash)
+    {
+        if (textureHash == 0 || gAddr.GetUixUtilityToFeedQuarkEnvironment == 0)
+            return;
+        if (!g_GetUixUtility)
+            g_GetUixUtility = reinterpret_cast<GetUixUtility_t>(ResolveGameAddress(gAddr.GetUixUtilityToFeedQuarkEnvironment));
+        if (!g_GetUixUtility)
+            return;
+        __try
+        {
+            void** util = g_GetUixUtility();
+            if (!util) return;
+            void** vtbl = *reinterpret_cast<void***>(util);
+            if (!vtbl) return;
+            auto fn = reinterpret_cast<void(__fastcall*)(void*, uint64_t, int)>(vtbl[0x548 / sizeof(void*)]);
+            if (fn) fn(util, textureHash, 2);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) {}
+    }
+
+    bool IsSortieEquip(int equipId)
+    {
+        if (!g_GetQuarkSystemTable)
+            return true;
+        __try
+        {
+            char* quark = reinterpret_cast<char*>(g_GetQuarkSystemTable());
+            if (!quark) return true;
+            const uintptr_t mgr = *reinterpret_cast<uintptr_t*>(quark + 0x98);
+            if (!mgr) return true;
+            const uintptr_t lm = *reinterpret_cast<uintptr_t*>(mgr + 0x130);
+            if (!lm) return true;
+            const uint8_t idx = *reinterpret_cast<uint8_t*>(lm + 0x3b4);
+            char* info = reinterpret_cast<char*>(lm + 0x10 + static_cast<uintptr_t>(idx) * 0xe8);
+
+            if (*reinterpret_cast<int*>(info + 0x18) == equipId) return true;
+            if (*reinterpret_cast<int*>(info + 0x2c) == equipId) return true;
+            if (*reinterpret_cast<int*>(info + 0x40) == equipId) return true;
+            for (int i = 0; i < 8; ++i)
+                if (*reinterpret_cast<int*>(info + 0x54 + i * 4) == equipId) return true;
+            for (int i = 0; i < 8; ++i)
+                if (*reinterpret_cast<int*>(info + 0x74 + i * 4) == equipId) return true;
+            return false;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return true; }
+    }
+
+
+    void Apply(void* node, uint64_t hash)
+    {
+        Prefetch(hash);
+        g_SetTextureName(node, hash, g_MaskSlot, 2);
+    }
+
+
+    uint8_t EquipBgApply(int equipId, void* node, SetWeaponPanelLogo_t orig)
+    {
+        if (node && Resolve())
+        {
+            const bool sortie = IsSortieEquip(equipId);
+
+            if (sortie)
+            {
+                Apply(node, NEW_TEXTURE);
+                return 1;
+            }
+        }
+        return orig(equipId, node);
+    }
+
+
+    uint8_t __fastcall hkSetWeaponPanelLogo(int equipId, void* node)
+    {
+        MISSION_GUARD_ORIGINAL_RET(g_OrigSetWeaponPanelLogo, equipId, node);
+        return EquipBgApply(equipId, node, g_OrigSetWeaponPanelLogo);
+    }
+}
 
 bool Install_SetEquipBackgroundTexture_Hook()
 {
-    void* targetSetEquipBackgroundTexture =
-        ResolveGameAddress(gAddr.SetEquipBackgroundTexture);
+    void* target = ResolveGameAddress(gAddr.SetEquipBackgroundTexture);
+    if (!target)
+        return false;
 
-    void* targetSetTextureName = ResolveGameAddress(gAddr.SetTextureName);
-    
-    const bool okSetEquipBackgroundTexture = CreateAndEnableHook(
-        targetSetEquipBackgroundTexture,
-        reinterpret_cast<void*>(&hkSetEquipBackgroundTexture),
-        reinterpret_cast<void**>(&g_OrigSetEquipBackgroundTexture));
-    
-    const bool okSetTextureName = CreateAndEnableHook(
-        targetSetTextureName,
-        reinterpret_cast<void*>(&hkSetTextureName),
-        reinterpret_cast<void**>(&g_OrigSetTextureName));
+    const bool ok = CreateAndEnableHook(
+        target,
+        reinterpret_cast<void*>(&hkSetWeaponPanelLogo),
+        reinterpret_cast<void**>(&g_OrigSetWeaponPanelLogo));
 
-    Log("[Hook] SetEquipBackgroundTexture hooks installed %p and %p\n",okSetEquipBackgroundTexture,okSetTextureName);
-    return true;
+    Resolve();
+
+    if (gGameBuild == AddressSetRuntime::GameBuild::Tpp_steam_mst_en_day3800)
+    {
+        void* guard = ResolveGameAddress(kAddr_TexStatusCreate_En154);
+        if (guard && !CreateAndEnableHook(
+                guard,
+                reinterpret_cast<void*>(&hkTexStatusCreate),
+                reinterpret_cast<void**>(&g_OrigTexStatusCreate)))
+            Log("[UiTextureGuard] install FAILED - a corrupt UI texture "
+                "descriptor will fault the render worker inside "
+                "fox::gr::TextureStreamerStatus instead of being skipped\n");
+    }
+
+#ifdef _DEBUG
+    Log("[Hook] EquipBgTexture: %s\n", ok ? "OK" : "FAIL");
+#else
+    if (!ok)
+        Log("[Hook] EquipBgTexture: %s\n", ok ? "OK" : "FAIL");
+#endif
+    return ok;
 }
 
-// Removes the SetLuaFunctions hook.
+
 bool Uninstall_SetEquipBackgroundTexture_Hook()
 {
     DisableAndRemoveHook(ResolveGameAddress(gAddr.SetEquipBackgroundTexture));
-    DisableAndRemoveHook(ResolveGameAddress(gAddr.SetTextureName));
-    g_OrigSetEquipBackgroundTexture = nullptr;
-    g_OrigSetTextureName = nullptr;
+
+    if (g_OrigTexStatusCreate)
+    {
+        DisableAndRemoveHook(ResolveGameAddress(kAddr_TexStatusCreate_En154));
+        g_OrigTexStatusCreate = nullptr;
+    }
+
+    g_OrigSetWeaponPanelLogo = nullptr;
     return true;
 }
+
 
 void SetEnableEquipBackgroundTexture(bool isEnable)
 {

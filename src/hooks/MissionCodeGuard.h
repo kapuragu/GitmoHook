@@ -9,7 +9,7 @@ namespace MissionCodeGuard
     bool ShouldBypassHooks();
 }
 
-// For hook callbacks that return void and should fall back to the original game function.
+
 #define MISSION_GUARD_ORIGINAL_VOID(origFn, ...)         \
     do                                                   \
     {                                                    \
@@ -21,7 +21,7 @@ namespace MissionCodeGuard
         }                                                \
     } while (0)
 
-// For plain void helpers/APIs that should just do nothing.
+
 #define MISSION_GUARD_RETURN_VOID()                      \
     do                                                   \
     {                                                    \
@@ -29,10 +29,18 @@ namespace MissionCodeGuard
             return;                                      \
     } while (0)
 
-// For bool helpers/APIs that should fail closed.
+
 #define MISSION_GUARD_RETURN_FALSE()                     \
     do                                                   \
     {                                                    \
         if (MissionCodeGuard::ShouldBypassHooks())       \
             return false;                                \
+    } while (0)
+
+
+#define MISSION_GUARD_ORIGINAL_RET(origFn, ...)          \
+    do                                                   \
+    {                                                    \
+        if (MissionCodeGuard::ShouldBypassHooks())       \
+            return (origFn)(__VA_ARGS__);                \
     } while (0)

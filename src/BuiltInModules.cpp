@@ -9,6 +9,8 @@
 #include "hooks/SoldierVoiceTypeQuery.h"
 #include "hooks/State_EnterStandHoldup1.h"
 #include "hooks/CpAntiAir.h"
+#include "hooks/OnHideBinoculars.h"
+#include "hooks/StateDoor.h"
 #include "hooks/VIPSoundRecoveryHook.h"
 #include "hooks/VoicePitchOverride.h"
 
@@ -392,50 +394,89 @@ namespace
             Uninstall_CpAntiAir_Hook();
         }
     };
+
+    class OnHideBinocularsModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "OnHideBinoculars";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            return Install_OnHideBinoculars_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_OnHideBinoculars_Hook();
+        }
+    };
+
+    class StateDoorModule final : public IFeatureModule
+    {
+    public:
+        const char* GetName() const override
+        {
+            return "StateDoor";
+        }
+
+        bool Install(HMODULE hGame) override
+        {
+            return Install_StateDoor_Hook();
+        }
+
+        void Uninstall() override
+        {
+            Uninstall_StateDoor_Hook();
+        }
+    };
 }
 
 void RegisterBuiltInFeatureModules()
 {
     static LuaBridgeModule s_LuaBridgeModule;
-    static GameOverScreenModule s_GameOverScreenModule;
-    static LoadingScreenModule s_LoadingScreenModule;
-    static SetEquipBackgroundTextureModule s_SetEquipBackgroundTextureModule;
+    //static GameOverScreenModule s_GameOverScreenModule;
+    //static LoadingScreenModule s_LoadingScreenModule;
+    //static SetEquipBackgroundTextureModule s_SetEquipBackgroundTextureModule;
     //static ChangeLocationMenuModule s_ChangeLocationMenuModule;
     //static PhotoAdditionalTextModule s_PhotoAdditionalTextModule;
-    static CautionTimerModule s_CautionTimerModule;
+    //static CautionTimerModule s_CautionTimerModule;
+    //static VIPSleepFaintModule s_VIPSleepFaintModule;
+    //static VIPHoldupModule s_VIPHoldupModule;
+    //static VIPSoundRecoveryModule s_VIPSoundRecoveryModule;
+    //static VIPRadioModule s_VIPRadioModule;
     //static HoldUpReactionCowardlyReactionsModule s_HoldUpReactionCowardlyReactionsModule;
-    
-    static LostHostageModule s_LostHostageModule;
-
-    static VIPSleepFaintModule s_VIPSleepFaintModule;
-    static VIPHoldupModule s_VIPHoldupModule;
-    static VIPSoundRecoveryModule s_VIPSoundRecoveryModule;
-    static VIPRadioModule s_VIPRadioModule;
-    static HoldupCancelLookToPlayerModule s_HoldupCancelLookToPlayerModule;
-    static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
+    //static LostHostageModule s_LostHostageModule;
+    //static HoldupCancelLookToPlayerModule s_HoldupCancelLookToPlayerModule;
+    //static SoldierVoiceTypeQueryModule s_SoldierVoiceTypeQueryModule;
     static CrawlSideRollModule s_CrawlSideRollModule;
-    
     static UpdateAntiAirModule s_UpdateAntiAirModule;
+    static OnHideBinocularsModule s_OnHideBinocularsModule;
+    static StateDoorModule s_StateDoorModule;
     
     static std::once_flag s_Once;
     std::call_once(s_Once, []()
         {
             FeatureModuleRegistry::Instance().Register(&s_LuaBridgeModule);
-            FeatureModuleRegistry::Instance().Register(&s_GameOverScreenModule);
-            FeatureModuleRegistry::Instance().Register(&s_LoadingScreenModule);
-            FeatureModuleRegistry::Instance().Register(&s_SetEquipBackgroundTextureModule);
+            //FeatureModuleRegistry::Instance().Register(&s_GameOverScreenModule);
+            //FeatureModuleRegistry::Instance().Register(&s_LoadingScreenModule);
+            //FeatureModuleRegistry::Instance().Register(&s_SetEquipBackgroundTextureModule);
             //FeatureModuleRegistry::Instance().Register(&s_ChangeLocationMenuModule);
             //FeatureModuleRegistry::Instance().Register(&s_PhotoAdditionalTextModule);
-            FeatureModuleRegistry::Instance().Register(&s_CautionTimerModule);
-            FeatureModuleRegistry::Instance().Register(&s_VIPSleepFaintModule);
-            FeatureModuleRegistry::Instance().Register(&s_VIPHoldupModule);
-            FeatureModuleRegistry::Instance().Register(&s_VIPSoundRecoveryModule);
-            FeatureModuleRegistry::Instance().Register(&s_VIPRadioModule);
+            //FeatureModuleRegistry::Instance().Register(&s_CautionTimerModule);
+            //FeatureModuleRegistry::Instance().Register(&s_VIPSleepFaintModule);
+            //FeatureModuleRegistry::Instance().Register(&s_VIPHoldupModule);
+            //FeatureModuleRegistry::Instance().Register(&s_VIPSoundRecoveryModule);
+            //FeatureModuleRegistry::Instance().Register(&s_VIPRadioModule);
             //FeatureModuleRegistry::Instance().Register(&s_HoldUpReactionCowardlyReactionsModule);
-            FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
-            FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
-            FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
+            //FeatureModuleRegistry::Instance().Register(&s_LostHostageModule);
+            //FeatureModuleRegistry::Instance().Register(&s_HoldupCancelLookToPlayerModule);
+            //FeatureModuleRegistry::Instance().Register(&s_SoldierVoiceTypeQueryModule);
             FeatureModuleRegistry::Instance().Register(&s_CrawlSideRollModule);
             FeatureModuleRegistry::Instance().Register(&s_UpdateAntiAirModule);
+            FeatureModuleRegistry::Instance().Register(&s_OnHideBinocularsModule);
+            FeatureModuleRegistry::Instance().Register(&s_StateDoorModule);
         });
 }

@@ -170,10 +170,12 @@
     <ClInclude Include="src\hooks\LuaApi.h" />
     <ClInclude Include="src\hooks\LuaBroadcaster.h" />
     <ClInclude Include="src\hooks\MissionCodeGuard.h" />
+    <ClInclude Include="src\hooks\OnHideBinoculars.h" />
     <ClInclude Include="src\hooks\SetEquipBackgroundTexture.h" />
     <ClInclude Include="src\hooks\SoldierAkObjIdMap.h" />
     <ClInclude Include="src\hooks\SoldierObjectRtpc.h" />
     <ClInclude Include="src\hooks\SoldierVoiceTypeQuery.h" />
+    <ClInclude Include="src\hooks\StateDoor.h" />
     <ClInclude Include="src\hooks\State_EnterStandHoldup1.h" />
     <ClInclude Include="src\hooks\StepRadioDiscovery.h" />
     <ClInclude Include="src\hooks\TelopStartTitleSetBgTexture.h" />
@@ -215,11 +217,13 @@
     <ClCompile Include="src\hooks\LuaApi.cpp" />
     <ClCompile Include="src\hooks\LuaBroadcaster.cpp" />
     <ClCompile Include="src\hooks\MissionCodeGuard.cpp" />
+    <ClCompile Include="src\hooks\OnHideBinoculars.cpp" /> 
     <ClCompile Include="src\hooks\SetEquipBackgroundTexture.cpp" />
     <ClCompile Include="src\hooks\SetLuaFunctions.cpp" />
     <ClCompile Include="src\hooks\SoldierAkObjIdMap.cpp" />
     <ClCompile Include="src\hooks\SoldierObjectRtpc.cpp" />
     <ClCompile Include="src\hooks\SoldierVoiceTypeQuery.cpp" />
+    <ClCompile Include="src\hooks\StateDoor.cpp" />
     <ClCompile Include="src\hooks\State_EnterStandHoldup1.cpp" />
     <ClCompile Include="src\hooks\State_StandHoldupCancelLookToPlayer.cpp" />
     <ClCompile Include="src\hooks\StepRadioDiscovery.cpp" />

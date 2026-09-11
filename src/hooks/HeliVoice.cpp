@@ -19,7 +19,7 @@ bool SetEnableHeliVoice(bool isEnable, const char *DD_vox_SH_voice_new, const ch
     Log("[GitmoHook] SetEnableHeliVoice start\n");
     
     uint32_t original_DD_vox_SH_voice_hash = FoxHashes::FNVHash32(DD_vox_SH_voice);
-    Log("[GitmoHook] SetEnableHeliVoice start 05\n");
+    //Log("[GitmoHook] SetEnableHeliVoice start 05\n");
     uint32_t new_DD_vox_SH_voice_hash = FoxHashes::FNVHash32(DD_vox_SH_voice_new);
     
     uint32_t original_DD_vox_SH_radio_hash = FoxHashes::FNVHash32(DD_vox_SH_radio);
@@ -38,7 +38,7 @@ bool SetEnableHeliVoice(bool isEnable, const char *DD_vox_SH_voice_new, const ch
     bool success2 = TogglePatch(isEnable, gAddr.DD_vox_SH_radio2, dwSize, original_DD_vox_SH_radio_Bytes, new_DD_vox_SH_radio_Bytes);
     bool success3 = TogglePatch(isEnable, gAddr.DD_vox_SH_radio3, dwSize, original_DD_vox_SH_radio_Bytes, new_DD_vox_SH_radio_Bytes);
     
-    Log("[GitmoHook] SetEnableHeliVoice set\n");
+    //Log("[GitmoHook] SetEnableHeliVoice set\n");
     
     return success0 && success1 && success2 && success3;
 }

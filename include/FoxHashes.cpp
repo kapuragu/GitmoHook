@@ -125,9 +125,7 @@ namespace FoxHashes
         
         std::string temp(text);
         auto str = &temp[0];
-        Log("[FoxHashes] FNVHash32 3 %s\n",str);
         auto ret = g_FNVHash32(str);
-        Log("[FoxHashes] FNVHash32 4 %ull\n",ret);
         return ret;
     }
 

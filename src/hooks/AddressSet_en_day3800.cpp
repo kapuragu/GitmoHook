@@ -114,6 +114,18 @@ namespace AddressSetRuntime
             
             0x140d7c770ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::UpdateAntiAir
             0x140d769b0ull,//tpp::gm::impl::cp::MemberRoleControllerImpl::ClearAntiAir
+            
+            0x140fe75a0ull,//tpp::gm::player::impl::UiControllerImpl::HideBinocle
+            
+            0x14126b610ull,//tpp::gm::player::impl::SearchLightActionPluginImpl::StateDoorStart
+            0x14126aea0ull,//tpp::gm::player::impl::SearchLightActionPluginImpl::StateDoorLoop
+            0x14126ab10ull,//tpp::gm::player::impl::SearchLightActionPluginImpl::StateDoorEnd
+            
+            0x14050b580ull, // GetUixUtilityToFeedQuarkEnvironment
+            
+            0x1408A9020ull, // TelopStartTitleEvCall_SetBgTexture
+            0x141DAE4A0ull, // Layout_GetLayout
+            0x141DAE4E0ull, // Layout_GetModel
         };
 
         return value;
